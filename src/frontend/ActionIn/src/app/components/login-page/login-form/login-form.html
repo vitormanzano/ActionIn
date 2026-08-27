@@ -1,0 +1,20 @@
+<div class="content">
+  <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form__fields">
+      <div class="attribute-entry">
+        <label for="email">Email </label>
+        <input id="email" type="email" [formControl]="form.controls.email" />
+      </div>
+
+      <div class="attribute-entry">
+        <label for="password">Password </label>
+        <input id="password" type="password" [formControl]="form.controls.password" />
+      </div>
+    </div>
+
+    <div class="form__button">
+      <button class="button">Login</button>
+    </div>
+  </form>
+  <p>Don't have an account? <a href=""> Sign up </a></p>
+</div>

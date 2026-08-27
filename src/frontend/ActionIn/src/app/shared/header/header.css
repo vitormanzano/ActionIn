@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #ff0;
+  padding: 1rem;
+  width: 100%;
+  height: 20rem;
+}
+
+.header__content {
+  display: flex;
+  width: fit-content;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0 0 40px 0;
+}
+
+.header__content img {
+  width: 544px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
