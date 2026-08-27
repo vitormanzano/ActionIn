@@ -61,7 +61,16 @@
   font-weight: 500;
 }
 
+.button-label {
+  padding: 10px;
+}
+
 .content > p {
   text-align: center;
   margin: 0;
+}
+
+.content > p > a {
+  color: #0f7ffa;
+  font-weight: 500;
 }
