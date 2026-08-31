@@ -14,7 +14,7 @@ export class LoginForm {
       validators: [Validators.email, Validators.required],
     }),
     password: new FormControl('', {
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.min(4)],
     }),
   });
 
