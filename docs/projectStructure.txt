@@ -1,0 +1,16 @@
+.
+├── docs
+│   ├── domain
+│   │   └── bounded-contexts.md
+│   ├── functionalRequirements
+│   │   ├── action
+│   │   └── user
+│   ├── projectStructure.txt
+│   └── userStories
+│       └── user
+├── README.md
+└── src
+    └── frontend
+        └── ActionIn
+
+11 directories, 3 files

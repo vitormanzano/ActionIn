@@ -1,7 +1,7 @@
-# FR01 - Create account
+# FR01 - Register account
 
 ## Description
-An anonymous user should be able to create an account by providing a username, email and password.
+An anonymous user should be able to register an account by providing a username, email and password.
 
 ## Actors
 Visitor (Unauthenticated user)
@@ -12,10 +12,10 @@ Visitor (Unauthenticated user)
 - The provided username is not already taken.
 
 ## Main flow
-1. Visitor navigates to the sign-up page
+1. Visitor navigates to the register page
 2. Visitor fills in username, email and password fields.
 3. System validates the input data.
-4. System creates the account.
+4. System register the account.
 5. System sends a welcome email to the provided email.
 6. Visitor is redirected to the login page.
 
@@ -28,10 +28,10 @@ AF-02 - Username already taken <br>
 At step 3, if the provided username is already associated with an existing account, the system display an error message indicating the username is unavailable. The form remains open for correction/submit.
 
 AF-03 - Invalid data <br>
-At step 3, if any fields fails validation, the system highlights the offending fields and display descriptive error messages. The account is not created.
+At step 3, if any fields fails validation, the system highlights the offending fields and display descriptive error messages. The account is not registered.
 
 ## Post-conditions
-- Account is created and persisted.
+- Account is registered and persisted.
 - Visitor is redirected to the login page.
 
 ## Requires
