@@ -21,7 +21,7 @@ public record Email
 
     private static bool EmailIsValid(string email)
     {
-        if (!string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(email))
             return false;
 
         return Regex.IsMatch(email,
