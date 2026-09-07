@@ -44,6 +44,8 @@ public class PasswordHasherTests
 
         var hashedPassword1 = hasher.Hash("vitor@123");
         var correctPassword = hasher.Verify("vitor@123", hashedPassword1);
+
+        Assert.True(correctPassword);
     }
 
     [Fact]
@@ -52,6 +54,8 @@ public class PasswordHasherTests
         var hasher = new PasswordHasher();
 
         var hashedPassword1 = hasher.Hash("vitor@123");
-        var correctPassword = hasher.Verify("manzano@123", hashedPassword1);
+        var wrongPassword = hasher.Verify("manzano@123", hashedPassword1);
+
+        Assert.False(wrongPassword);
     }
 }
