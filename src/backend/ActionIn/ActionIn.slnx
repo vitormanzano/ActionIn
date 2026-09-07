@@ -3,5 +3,8 @@
         <Project Path="src/ActionIn.Authentication.Domain/ActionIn.Authentication.Domain.csproj" />
         <Project Path="src/ActionIn.Core/ActionIn.Core.csproj" />
     </Folder>
-    <Project Path="tests/ActionIn.Core.Tests/ActionIn.Core.Tests.csproj" />
+    <Folder Name="/tests/">
+        <Project Path="tests/ActionIn.Authentication.Tests/ActionIn.Authentication.Tests.csproj" />
+        <Project Path="tests/ActionIn.Core.Tests/ActionIn.Core.Tests.csproj" />
+    </Folder>
 </Solution>
