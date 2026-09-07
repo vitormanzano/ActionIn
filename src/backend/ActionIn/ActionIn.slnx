@@ -1,6 +1,8 @@
 <Solution>
     <Folder Name="/src/">
-        <Project Path="src/ActionIn.Authentication.Domain/ActionIn.Authentication.Domain.csproj" />
+        <Folder Name = "/src/Authentication/">
+            <Project Path="src/Authentication/ActionIn.Authentication.Domain/ActionIn.Authentication.Domain.csproj" />
+        </Folder>
         <Project Path="src/ActionIn.Core/ActionIn.Core.csproj" />
     </Folder>
     <Folder Name="/tests/">
