@@ -4,6 +4,8 @@ public record Username
 {
     public string Value { get; private set; } = string.Empty;
 
+    private Username() { }
+
     public Username(string username)
     {
         SetUsername(username);

@@ -6,6 +6,8 @@ public record Email
 {
     public string Value { get; private set; } = string.Empty;
 
+    private Email() { }
+
     public Email(string email)
     {
         SetEmail(email);
