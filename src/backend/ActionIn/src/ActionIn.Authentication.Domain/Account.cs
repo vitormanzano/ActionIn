@@ -11,7 +11,7 @@ public class Account : Entity
 
     private Account() { }
 
-    public Account Register(string username, string email, Password password)
+    public static Account Register(string username, string email, Password password)
     {
         return new Account
         {
