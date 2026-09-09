@@ -11,6 +11,14 @@ public class AccountService(IAccountRepository accountRepository,
 {
     public async Task<bool> RegisterAsync(RegisterAccountDto account)
     {
+        var emailAlreadyExists = await accountRepository.GetByEmailAsync(account.Email);  
+        if (emailAlreadyExists != null)
+            throw new Exception("Email already exists");
+        
+        var usernameAlreadyExists = await accountRepository.GetByUsernameAsync(account.Username);
+        if (usernameAlreadyExists != null)
+            throw new Exception("Username already exists");
+        
         var password = Password.Create(account.Password, passwordHasher);
         accountRepository.Register(Account.Register(account.Username, account.Email, password));
 
