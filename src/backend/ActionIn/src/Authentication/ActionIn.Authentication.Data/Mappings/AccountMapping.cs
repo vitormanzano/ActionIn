@@ -10,17 +10,24 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
     {
         builder.HasKey(a => a.Id);
 
-        builder.OwnsOne(a => a.Username)
-            .Property(u => u.Value)
-            .HasColumnName("username")
-            .HasMaxLength(255)
-            .IsRequired();
+        builder.OwnsOne(a => a.Username, b =>
+        {
+            b.Property(u => u.Value)
+                .HasColumnName("username")
+                .HasMaxLength(255)
+                .IsRequired();
+            b.HasIndex(u => u.Value).IsUnique();
+        });
 
-        builder.OwnsOne(a => a.Email)
-            .Property(e => e.Value)
-            .HasColumnName("email")
-            .HasMaxLength(255)
-            .IsRequired();
+        builder.OwnsOne(a => a.Email, b =>
+        {
+            b.Property(e => e.Value)
+                .HasColumnName("email")
+                .HasMaxLength(255)
+                .IsRequired();
+
+            b.HasIndex(u => u.Value).IsUnique();
+        });
 
         builder.OwnsOne(a => a.Password)
             .Property(p => p.Value)
