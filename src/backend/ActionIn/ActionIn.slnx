@@ -4,6 +4,7 @@
     </Folder>
     <Folder Name="/src/Authentication/">
         <Project Path="src/Authentication/ActionIn.Authentication.Domain/ActionIn.Authentication.Domain.csproj" />
+        <Project Path="src/Authentication/ActionIn.Authentication.Application/ActionIn.Authentication.Application.csproj" />
         <Project Path="src/Authentication/ActionIn.Authentication.Data/ActionIn.Authentication.Data.csproj" />
     </Folder>
     <Folder Name="/tests/">

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ActionIn.Authentication.Application\ActionIn.Authentication.Application.csproj" />
     <ProjectReference Include="..\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
     <ProjectReference Include="..\..\ActionIn.Core\ActionIn.Core.csproj" />
   </ItemGroup>
