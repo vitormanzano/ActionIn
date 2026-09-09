@@ -1,5 +1,4 @@
 using ActionIn.Authentication.Application.Dtos;
-using ActionIn.Authentication.Data.Repository;
 using ActionIn.Authentication.Domain;
 using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Authentication.Domain.Hasher;
