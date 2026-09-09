@@ -1,0 +1,306 @@
+RELATORIO DE MELHORIAS - ActionIn Backend (Authentication)
+============================================================
+
+Escopo revisado: ActionIn.Core, ActionIn.Authentication.Domain,
+ActionIn.Authentication.Application, ActionIn.Authentication.Data,
+e os projetos de teste (ActionIn.Core.Tests, ActionIn.Authentication.Tests).
+
+Itens organizados por prioridade. Cada item tem O QUE FAZER e COMO AFETA / POR QUE.
+
+
+============================================================
+CRITICO - impede o build ou compromete a corretude dos dados
+============================================================
+
+1. DEPENDENCIA CIRCULAR: Application <-> Data (a solucao nao compila)
+------------------------------------------------------------
+Confirmado rodando "dotnet build ActionIn.slnx":
+
+    error MSB4006: There is a circular dependency in the target
+    dependency graph involving target "_GenerateRestoreProjectPathWalk"
+    [ActionIn.Authentication.Application.csproj]
+
+Causa: ActionIn.Authentication.Application.csproj referencia
+ActionIn.Authentication.Data.csproj (porque AccountService usa
+"ActionIn.Authentication.Data.Repository" para pegar IAccountRepository),
+e ActionIn.Authentication.Data.csproj referencia de volta
+ActionIn.Authentication.Application.csproj. Isso e uma referencia
+circular real entre os dois projetos - o MSBuild se recusa a resolver.
+
+O QUE FAZER:
+  - Mover a interface IAccountRepository (e futuras interfaces de
+    repositorio) de ActionIn.Authentication.Data/Repository/ para
+    ActionIn.Authentication.Application/Repositories/ (ou Domain, se
+    preferir manter repositorios como conceito de dominio).
+  - AccountRepository (implementacao, fica em Data) passa a implementar
+    essa interface vinda de Application.
+  - Remover a ProjectReference de Data em Application.csproj.
+  - Trocar o "using ActionIn.Authentication.Data.Repository;" em
+    AccountService.cs para "using ActionIn.Authentication.Application.Repositories;"
+  - Remover o "using ActionIn.Authentication.Application.Dtos;" nao usado
+    em AccountRepository.cs (sobrou de uma tentativa anterior).
+
+COMO AFETA / POR QUE:
+  Sem essa correcao, literalmente nada compila - nem os projetos de
+  teste, porque dependem transitivamente de Data e Application. Alem
+  disso, a direcao correta em Clean/Onion Architecture e sempre
+  Infraestrutura -> Application -> Domain (nunca o contrario): quem
+  implementa uma interface depende de quem a declara, nao o inverso.
+  Isso tambem resolve o problema de raiz: hoje o projeto de dados
+  "sabe" sobre a camada de aplicacao, o que nao devia acontecer.
+
+
+2. FALTA TRATAMENTO DE ERRO DE PERSISTENCIA (excecao crua vaza)
+------------------------------------------------------------
+AccountService.RegisterAsync chama accountRepository.UnitOfWork.Commit()
+sem nenhum try/catch. Se o SaveChangesAsync falhar (ex: violacao do
+indice unico de username/email sob concorrencia - duas requisicoes
+simultaneas passam pela checagem de "ja existe" antes de qualquer
+uma commitar), o que sobe para quem chama o service e um
+DbUpdateException/PostgresException cru do EF Core/Npgsql.
+
+O QUE FAZER:
+  Capturar DbUpdateException no Commit (ou no RegisterAsync) e traduzir
+  para uma excecao de aplicacao/dominio (ex: AccountAlreadyExistsException),
+  usando o Postgres error code (23505 = unique_violation) para diferenciar
+  de outros erros de banco.
+
+COMO AFETA / POR QUE:
+  A checagem previa (GetByEmailAsync/GetByUsernameAsync antes do Commit)
+  reduz a chance do problema, mas nao elimina condicao de corrida entre
+  a checagem e o commit. Sem tratar isso, quem consome o service (futura
+  camada web) precisaria conhecer detalhes de EF Core/Postgres para
+  tratar o erro certo, o que quebra a fronteira entre camadas.
+
+
+============================================================
+ALTO - afeta corretude/uso da API, mas nao impede o build
+============================================================
+
+3. RegisterAsync retorna bool que nunca e realmente usado
+------------------------------------------------------------
+    var success = await accountRepository.UnitOfWork.Commit();
+    return !success ? throw new Exception("Failed to create account") : true;
+
+Ou lanca excecao, ou retorna true. O bool no contrato (Task<bool>)
+nunca carrega informacao real.
+
+O QUE FAZER:
+  Trocar a assinatura para Task (sem retorno) já que o erro sempre e
+  sinalizado por excecao, ou retornar algo util (ex: Guid do Account.Id
+  criado / o proprio Account).
+
+COMO AFETA / POR QUE:
+  A assinatura atual engana quem le o codigo - parece que faz sentido
+  checar o retorno, mas o "false" nunca acontece na pratica.
+
+
+4. AccountRepository.Dispose() da dispose no DbContext injetado por DI
+------------------------------------------------------------
+    public void Dispose() => context.Dispose();
+
+AuthenticationContext e injetado via construtor (presumivelmente
+Scoped no container de DI). Quem cria essa instancia (o container) e
+quem deveria decidir quando descarta-la, nao o repositorio.
+
+O QUE FAZER:
+  Remover o Dispose manual do context dentro do repositorio (e do
+  AccountService, que hoje tambem chama accountRepository?.Dispose()).
+  Deixar o ciclo de vida do DbContext inteiramente a cargo do
+  container de DI (Scoped).
+
+COMO AFETA / POR QUE:
+  Se, conforme o projeto crescer, mais de um repositorio compartilhar
+  o mesmo DbContext dentro do mesmo escopo (mesma requisicao), um
+  repositorio sendo Dispose()ado antes da hora derruba o contexto
+  para os outros ainda em uso no mesmo escopo - bug dificil de
+  rastrear porque so aparece com mais de uma dependencia por request.
+
+
+5. Sem indices/wiring de DI (Program.cs / DependencyInjection.cs)
+------------------------------------------------------------
+Nao existe nenhum projeto de host (WebApi) nem um metodo de extensao
+tipo "AddAuthenticationData(IServiceCollection, IConfiguration)"
+registrando AuthenticationContext, IAccountRepository, IPasswordHasher,
+IAccountService no container.
+
+O QUE FAZER:
+  Criar em ActionIn.Authentication.Data um DependencyInjection.cs com
+  um metodo de extensao AddAuthenticationData, e o mesmo padrao em
+  Application se fizer sentido (registrar IAccountService). Quando a
+  camada web existir, ela so chama esses metodos de extensao.
+
+COMO AFETA / POR QUE:
+  Sem isso o fluxo de Register nunca roda de fato fora de testes
+  manuais - e quando a webapp for criada, concentrar o registro de
+  dependencias no proprio modulo evita que o Program.cs vire um
+  arquivo gigante conhecendo detalhes internos de cada camada.
+
+
+============================================================
+MEDIO - qualidade, consistencia e robustez do schema
+============================================================
+
+6. DbSet<Account> Accounts { get; set; } deveria ser getter-only
+------------------------------------------------------------
+Com Nullable habilitado (esta em todos os csproj), essa propriedade
+com "set" publico e sem inicializacao deveria gerar warning CS8618
+(propriedade nao-nula sem valor atribuido).
+
+O QUE FAZER:
+    public DbSet<Account> Accounts => Set<Account>();
+
+COMO AFETA / POR QUE:
+  Remove o warning sem depender do EF Core preencher a propriedade via
+  reflection nos bastidores - e o padrao recomendado pela propria
+  documentacao do EF Core 8+.
+
+
+7. Account.Id sem ValueGeneratedNever() explicito
+------------------------------------------------------------
+Entity gera o Guid no construtor (em memoria) - o banco nao gera
+nada. Por convencao, o EF Core as vezes assume ValueGeneratedOnAdd
+para chaves Guid.
+
+O QUE FAZER:
+    builder.HasKey(a => a.Id);
+    builder.Property(a => a.Id).ValueGeneratedNever();
+
+COMO AFETA / POR QUE:
+  Deixa explicito que o valor da chave sempre vem da aplicacao, evitando
+  qualquer ambiguidade de convencao caso o provider mude de
+  comportamento entre versoes.
+
+
+8. Entity.operator ==/!= com parametros nao-anulaveis
+------------------------------------------------------------
+    public static bool operator ==(Entity a, Entity b)
+    public static bool operator !=(Entity a, Entity b)
+
+A implementacao ja trata null corretamente via ReferenceEquals, mas a
+assinatura nao esta anotada como anulavel - gera o warning "Possible
+'null' reference argument" toda vez que alguem compara uma
+Account?/Entity? com null (ja aconteceu no AccountService).
+
+O QUE FAZER:
+    public static bool operator ==(Entity? a, Entity? b)
+    public static bool operator !=(Entity? a, Entity? b)
+
+COMO AFETA / POR QUE:
+  So corrige a anotacao de nulidade (sem mudar comportamento). Sem
+  isso, o warning vai aparecer toda vez que qualquer entidade for
+  comparada com null em qualquer camada do projeto - ruido constante.
+  (Decisao do usuario: por ora, manter como esta.)
+
+
+9. AccountMapper esta vazio (classe estatica sem nenhum membro)
+------------------------------------------------------------
+ActionIn.Authentication.Application/Mappers/AccountMapper.cs so tem
+"public static class AccountMapper { }". Nao e usado em lugar nenhum -
+AccountService monta o Account manualmente a partir do DTO.
+
+O QUE FAZER:
+  Ou remover o arquivo ate ter uso real, ou usa-lo de fato para tirar
+  a logica de "DTO -> chamada de dominio" de dentro do AccountService.
+
+COMO AFETA / POR QUE:
+  Codigo morto confunde quem for mexer no projeto depois - parece
+  incompleto ou esquecido.
+
+
+10. Password.Validate nao trata null (inconsistente com Username)
+------------------------------------------------------------
+Username.ValidateUsername checa "username is null" explicitamente
+antes de qualquer outra coisa. Password.Validate so faz
+"password.Length < 4", o que lanca NullReferenceException (nao uma
+excecao de dominio) se vier null.
+
+O QUE FAZER:
+    public static void Validate(string password)
+    {
+        if (password is null)
+            throw new Exception("Password cannot be null");
+        if (password.Length < 4)
+            throw new Exception("Password must be at least 4 characters!");
+    }
+
+COMO AFETA / POR QUE:
+  Mesma classe de problema (validacao de VO) tratada de formas
+  diferentes entre Username e Password - inconsistencia de mensagens
+  de erro e de tipo de excecao lancada.
+
+
+11. GetByUsernameAsync / GetByEmailAsync sem CancellationToken
+------------------------------------------------------------
+Nenhum metodo assincrono do fluxo (RegisterAsync, Commit, as queries do
+repositorio) aceita CancellationToken.
+
+O QUE FAZER:
+  Adicionar "CancellationToken cancellationToken = default" nos
+  metodos assincronos e repassar para FirstOrDefaultAsync/SaveChangesAsync.
+
+COMO AFETA / POR QUE:
+  Sem isso, uma requisicao HTTP cancelada pelo cliente (usuario fechou
+  a aba, timeout) continua rodando a query/commit no banco ate o fim -
+  desperdicio de conexao/recursos. Baixo impacto agora (sem camada web
+  ainda), mas vale prever desde ja para nao precisar mudar assinatura
+  de metodo publico depois.
+
+
+============================================================
+BAIXO - limpeza e consistencia de testes
+============================================================
+
+12. FakePasswordHahser duplicado (e com erro de digitacao no nome)
+------------------------------------------------------------
+Existe uma classe "FakePasswordHahser" (falta o "s" - deveria ser
+"Hasher") definida duas vezes: em AccountTests.cs (namespace
+ActionIn.Authentication.Tests) e em PasswordTests.cs (namespace
+ActionIn.Authentication.Tests.DomainObjects). Nao da erro de
+compilacao porque os namespaces sao diferentes, mas e codigo
+duplicado.
+
+O QUE FAZER:
+  Extrair para uma unica classe (ex: Tests/Fakes/FakePasswordHasher.cs,
+  namespace compartilhado) e reaproveitar nos dois arquivos de teste.
+  Aproveitar para corrigir o nome (Hasher, nao Hahser).
+
+COMO AFETA / POR QUE:
+  Duplicacao de test double e o tipo de coisa que diverge com o tempo
+  (alguem corrige um, esquece do outro) e infla o projeto de teste sem
+  necessidade.
+
+
+13. Nenhum teste ainda cobre o fluxo real de Register (Service/Repository)
+------------------------------------------------------------
+UsernameTests, EmailTests, PasswordTests, PasswordHasherTests, EntityTests
+e AccountTests (so testando Account.Register puro) tem boa cobertura.
+Mas AccountService.RegisterAsync, AccountRepository e AccountMapping
+nao tem nenhum teste ainda.
+
+O QUE FAZER:
+  Depois de resolver o item 1 (dependencia circular), criar:
+  - Testes de AccountService.RegisterAsync com um fake/mock de
+    IAccountRepository (verificando que lanca excecao quando
+    username/email ja existe, e que chama Commit no caminho feliz).
+  - Um teste de integracao com EF Core InMemory ou um Postgres real
+    via Testcontainers para validar o AccountMapping (index unico,
+    tamanho de coluna, materializacao dos owned types).
+
+COMO AFETA / POR QUE:
+  E exatamente o AccountMapping que motivou a duvida original sobre
+  constructor binding do EF Core - so um teste de integracao real
+  confirma que o mapeamento funciona de ponta a ponta (hoje isso nunca
+  foi validado, so revisado por leitura de codigo).
+
+
+============================================================
+RESUMO / ORDEM SUGERIDA
+============================================================
+1. Circular dependency (Application <-> Data) - bloqueia tudo, resolver primeiro.
+2. Tratamento de excecao de persistencia no RegisterAsync.
+3. Assinatura de RegisterAsync (bool inutil).
+4. Dispose do DbContext no repositorio/service.
+5. DI wiring (DependencyInjection.cs).
+6-11. Ajustes de schema/consistencia (podem ser feitos em qualquer ordem).
+12-13. Limpeza e cobertura de testes.

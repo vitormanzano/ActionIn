@@ -1,8 +1,6 @@
-using ActionIn.Authentication.Application.Dtos;
-using ActionIn.Authentication.Domain;
 using ActionIn.Core.Data;
 
-namespace ActionIn.Authentication.Data.Repository;
+namespace ActionIn.Authentication.Domain.Repository;
 
 public interface IAccountRepository : IRepository<Account>
 {

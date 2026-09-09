@@ -1,5 +1,6 @@
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.Authentication.Domain;
+using ActionIn.Authentication.Domain.Repository;
 using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Core.Data;
 using Microsoft.EntityFrameworkCore;
