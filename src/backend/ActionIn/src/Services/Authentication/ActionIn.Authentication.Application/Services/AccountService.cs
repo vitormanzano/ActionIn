@@ -24,6 +24,13 @@ public class AccountService(IAccountRepository accountRepository,
         return !success ? throw new Exception("Failed to create account") : true;
     }
 
+    public async Task<bool> LoginAsync(LoginAccountDto account)
+    {
+        var existingAccount = await accountRepository.GetByEmailAsync(account.Email);
+
+        return existingAccount is not null && existingAccount.VerifyPassword(account.Password, passwordHasher);
+    }
+
     public void Dispose()
     {
         accountRepository?.Dispose();
