@@ -1,14 +1,16 @@
 <Solution>
-    <Folder Name="/src/">
+    <Folder Name="/src/" />
+    <Folder Name="/src/Services/">
         <Project Path="src/ActionIn.Core/ActionIn.Core.csproj" />
     </Folder>
-    <Folder Name="/src/Authentication/">
-        <Project Path="src/Authentication/ActionIn.Authentication.Domain/ActionIn.Authentication.Domain.csproj" />
+    <Folder Name="/src/Services/Authentication/">
         <Project Path="src/Authentication/ActionIn.Authentication.Application/ActionIn.Authentication.Application.csproj" />
         <Project Path="src/Authentication/ActionIn.Authentication.Data/ActionIn.Authentication.Data.csproj" />
+        <Project Path="src/Authentication/ActionIn.Authentication.Domain/ActionIn.Authentication.Domain.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/ActionIn.Authentication.Tests/ActionIn.Authentication.Tests.csproj" />
         <Project Path="tests/ActionIn.Core.Tests/ActionIn.Core.Tests.csproj" />
     </Folder>
+    <Folder Name="/WebApp/" />
 </Solution>
