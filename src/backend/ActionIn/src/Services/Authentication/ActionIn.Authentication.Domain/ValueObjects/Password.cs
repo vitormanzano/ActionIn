@@ -20,7 +20,7 @@ public record Password
 
     public static void Validate(string password)
     {
-        if (password.Length is null)
+        if (password is null)
             throw new Exception("Password cannot be null");
 
         if (password.Length < 4)
