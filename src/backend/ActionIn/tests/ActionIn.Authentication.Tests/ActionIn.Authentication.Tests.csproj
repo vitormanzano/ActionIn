@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Authentication\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
+        <ProjectReference Include="..\..\src\Services\Authentication\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
     </ItemGroup>
 </Project>
 
