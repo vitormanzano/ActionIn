@@ -1,8 +1,8 @@
-﻿namespace ActionIn.Authentication.Tests;
+namespace ActionIn.Authentication.Tests;
 
 using Domain;
 using Domain.Hasher;
-using Domain.ValueObjects;
+
 public class FakePasswordHahser : IPasswordHasher
 {
     public string Hash(string password) => $"hashed:{password}";
@@ -17,17 +17,32 @@ public class AccountTests
     [Fact]
     public void Register_ValidData_CreatesAccount()
     {
-        var password = Password.Create("senha123", _hasher);
-        var account = Account.Register("vitor", "vitor@gmail.com", password);
+        var account = Account.Register("vitor", "vitor@gmail.com", "senha123", _hasher);
 
         Assert.Equal("vitor", account.Username.Value);
         Assert.Equal("vitor@gmail.com", account.Email.Value);
+        Assert.Equal("hashed:senha123", account.Password.Value);
     }
 
     [Fact]
     public void Register_InvalidUsername_ThrowsException()
     {
-        var password = Password.Create("senha123", _hasher);
-        Assert.Throws<Exception>(() => Account.Register("abc", "vitor@gmail.com", password));
+        Assert.Throws<Exception>(() => Account.Register("abc", "vitor@gmail.com", "senha123", _hasher));
+    }
+
+    [Fact]
+    public void VerifyPassword_CorrectRawPassword_ReturnsTrue()
+    {
+        var account = Account.Register("vitor", "vitor@gmail.com", "senha123", _hasher);
+
+        Assert.True(account.VerifyPassword("senha123", _hasher));
+    }
+
+    [Fact]
+    public void VerifyPassword_WrongRawPassword_ReturnsFalse()
+    {
+        var account = Account.Register("vitor", "vitor@gmail.com", "senha123", _hasher);
+
+        Assert.False(account.VerifyPassword("outrasenha", _hasher));
     }
 }

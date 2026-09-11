@@ -1,6 +1,5 @@
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.Authentication.Domain;
-using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Authentication.Domain.Hasher;
 using ActionIn.Authentication.Domain.Repository;
 
@@ -19,8 +18,7 @@ public class AccountService(IAccountRepository accountRepository,
         if (usernameAlreadyExists != null)
             throw new Exception("Username already exists");
         
-        var password = Password.Create(account.Password, passwordHasher);
-        accountRepository.Register(Account.Register(account.Username, account.Email, password));
+        accountRepository.Register(Account.Register(account.Username, account.Email, account.Password, passwordHasher));
 
         var success = await accountRepository.UnitOfWork.Commit();
         return !success ? throw new Exception("Failed to create account") : true;
