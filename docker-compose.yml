@@ -1,0 +1,26 @@
+name: ActionIn
+
+volumes:
+  Action_in_data:
+
+services:
+  postgres:
+    container_name: ActionInBackend
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ActionIn
+    ports:
+      - "5432:5432"
+    volumes:
+      - my_expenses_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+
+# pgcli -h localhost -U postgres -d Expenses
+# OR
+# pgcli postgresql://postgres:postgres@localhost/Expenses
