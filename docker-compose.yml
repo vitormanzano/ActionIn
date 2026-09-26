@@ -1,7 +1,7 @@
 name: ActionIn
 
 volumes:
-  Action_in_data:
+  action_in_data:
 
 services:
   postgres:
@@ -14,13 +14,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - my_expenses_data:/var/lib/postgresql
+      - action_in_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 15s
       retries: 3
 
-# pgcli -h localhost -U postgres -d Expenses
+# pgcli -h localhost -U postgres -d ActionIn
 # OR
 # pgcli postgresql://postgres:postgres@localhost/Expenses
