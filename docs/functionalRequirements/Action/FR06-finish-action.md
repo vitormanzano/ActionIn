@@ -1,7 +1,7 @@
 # FR06 - Finish action
 
 ## Description
-An authenticated user should be able to stop a action.
+An authenticated user should be able to finish an action.
 
 ## Actors
 Authenticated user
@@ -13,10 +13,10 @@ Authenticated user
 ## Main flow
 1. User navigates to the main page
 2. User clicks done button.
-4. User clicks the button confirm.
-5. System validates the data.
-6. System creates the action.
-7. User is redirected to the main page.
+3. User clicks the button confirm.
+4. System validates the data.
+5. System creates the action.
+6. User is redirected to the main page.
 
 ## Alternatives flows
 
