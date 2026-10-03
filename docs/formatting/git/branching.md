@@ -20,19 +20,23 @@ During the lifespan of the feature development, if there have been commits since
 format: <feature/ticketId>
 
 #### How to do it? 
-git checkout -b feature/id main                 // creates a local branch for the new feature
-git push origin feature/id                        // makes the new feature remotely available
+`git checkout -b feature/id main`                 // creates a local branch for the new feature
+
+`git push origin feature/id`                      // makes the new feature remotely available
 
 Periodically, changes made to main (if any) should be merged back into your feature branch.
 
-git merge main                                  // merges changes from main into feature branch
+`git merge main`                                  // merges changes from main into feature branch
 
 When development on the feature is complete, the lead (or engineer in charge) should merge changes into main and then make sure the remote branch is deleted.
 
-git checkout main                               // change to the main branch  
-git merge --no-ff feature/id                      // makes sure to create a commit object during merge
-git push origin main                            // push merge changes
-git push origin :feature/id                      // deletes the remote branch
+`git checkout main`                               // change to the main branch  
+
+`git merge --no-ff feature/id`                      // makes sure to create a commit object during merge
+
+`git push origin main`                            // push merge changes
+
+`git push origin :feature/id`                      // deletes the remote branch
 
 ### Bug Branches
 Bug branches differ from feature branches only semantically. Bug branches will be created when there is a bug on the live site that should be fixed and merged into the next deployment. For that reason, a bug branch typically will not last longer than one deployment cycle. Additionally, bug branches are used to explicitly track the difference between bug development and feature development. No matter when the bug branch will be finished, it will always be merged back into main.
@@ -42,19 +46,23 @@ if there have been commits since the bug was branched. Any and all changes to ma
 format: <bugfix/ticketId>
 
 #### How to do it?
-git checkout -b bugfix/id main                     // creates a local branch for the new bug
-git push origin bugfix/id                            // makes the new bug remotely available
+`git checkout -b bugfix/id main`                     // creates a local branch for the new bug
+
+`git push origin bugfix/id`                            // makes the new bug remotely available
 
 Periodically, changes made to main (if any) should be merged back into your bug branch.
 
-git merge main                                  // merges changes from main into bug branch
+`git merge main`                                  // merges changes from main into bug branch
 
 When development on the bug is complete, [the Lead] should merge changes into main and then make sure the remote branch is deleted.
 
-git checkout main                               // change to the main branch  
-git merge --no-ff bugfix/id                          // makes sure to create a commit object during merge
-git push origin main                            // push merge changes
-git push origin :bugfix/id                           // deletes the remote branch
+`git checkout main`                               // change to the main branch  
+
+`git merge --no-ff bugfix/id`                          // makes sure to create a commit object during merge
+
+`git push origin main`                            // push merge changes
+
+`git push origin :bugfix/id`                           // deletes the remote branch
 
 
 
