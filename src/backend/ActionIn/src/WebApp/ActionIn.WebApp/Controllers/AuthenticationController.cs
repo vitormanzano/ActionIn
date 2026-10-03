@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace ActionIn.WebApp.Controllers;
 
-public class AuthenticationController
+[ApiController]
+[Route("[controller]")]
+public class AuthenticationController : ControllerBase
 {
 }
 
