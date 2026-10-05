@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ActionIn.Authentication.Data.Repository;
 
-public class AccountRepository(AuthenticationContext context) : IAccountRepository
+public class AuthenticationRepository(AuthenticationContext context) : IAuthenticationRepository
 {
     public IUnitOfWork UnitOfWork => context;
 
@@ -26,11 +26,11 @@ public class AccountRepository(AuthenticationContext context) : IAccountReposito
     public async Task<Account?> GetByEmailAsync(string email)
     {
         var normalized = new Email(email).Value;
-        
+
         return await context.Accounts
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Email.Value == normalized);
-        
+
     }
 
     public void Dispose()

@@ -6,15 +6,15 @@ using ActionIn.Core.Mediatr;
 
 namespace ActionIn.Authentication.Domain.Services;
 
-public class AuthenticationService(IAccountRepository accountRepository, IPasswordHasher passwordHasher, IMediatrHandler bus) : IAuthenticationService
+public class AuthenticationService(IAuthenticationRepository authenticationRepository, IPasswordHasher passwordHasher, IMediatrHandler bus) : IAuthenticationService
 {
     public async Task<bool> RegisterAsync(string username, string email, string password)
     {
-        var emailAlreadyExists = await accountRepository.GetByEmailAsync(email);
+        var emailAlreadyExists = await authenticationRepository.GetByEmailAsync(email);
         if (emailAlreadyExists is not null)
             throw new Exception("Email already exists");
 
-        var usernameAlreadyExists = await accountRepository.GetByUsernameAsync(username);
+        var usernameAlreadyExists = await authenticationRepository.GetByUsernameAsync(username);
         if (usernameAlreadyExists is not null)
             throw new Exception("Username already exists");
 
@@ -23,9 +23,9 @@ public class AuthenticationService(IAccountRepository accountRepository, IPasswo
         var hashedPassword = Password.FromHash(passwordHasher.Hash(password));
 
         var entity = Account.Register(username, email, hashedPassword);
-        accountRepository.Register(entity);
+        authenticationRepository.Register(entity);
 
-        var success = await accountRepository.UnitOfWork.Commit();
+        var success = await authenticationRepository.UnitOfWork.Commit();
         if (!success)
             throw new Exception("Something went wrong");
 
@@ -35,7 +35,7 @@ public class AuthenticationService(IAccountRepository accountRepository, IPasswo
 
     public async Task<bool> LoginAsync(string email, string password)
     {
-        var existingAccount = await accountRepository.GetByEmailAsync(email);
+        var existingAccount = await authenticationRepository.GetByEmailAsync(email);
 
         if (existingAccount is null)
             throw new Exception("Wrong credentials!");
@@ -50,7 +50,7 @@ public class AuthenticationService(IAccountRepository accountRepository, IPasswo
 
     public void Dispose()
     {
-        accountRepository?.Dispose();
+        authenticationRepository?.Dispose();
     }
 }
 

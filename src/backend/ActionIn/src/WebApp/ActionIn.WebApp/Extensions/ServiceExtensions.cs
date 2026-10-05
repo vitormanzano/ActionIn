@@ -1,8 +1,8 @@
-using ActionIn.Authentication.Application.Services;
 using ActionIn.Authentication.Data;
 using ActionIn.Authentication.Data.Repository;
 using ActionIn.Authentication.Domain.Hasher;
 using ActionIn.Authentication.Domain.Repository;
+using ActionIn.Authentication.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ActionIn.WebApp.Extensions;
@@ -12,8 +12,8 @@ public static class ServiceExtensions
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
         services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
         return services;
     }
