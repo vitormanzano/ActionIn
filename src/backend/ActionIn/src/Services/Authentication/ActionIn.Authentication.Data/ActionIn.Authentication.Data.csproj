@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -16,9 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ActionIn.Authentication.Application\ActionIn.Authentication.Application.csproj" />
     <ProjectReference Include="..\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
     <ProjectReference Include="..\..\ActionIn.Core\ActionIn.Core.csproj" />
   </ItemGroup>
-
 </Project>

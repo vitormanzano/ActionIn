@@ -8,7 +8,7 @@ namespace ActionIn.Authentication.Domain.Services;
 
 public class AuthenticationService(IAuthenticationRepository authenticationRepository, IPasswordHasher passwordHasher, IMediatrHandler bus) : IAuthenticationService
 {
-    public async Task<bool> RegisterAsync(string username, string email, string password)
+    public async Task<Account> RegisterAsync(string username, string email, string password)
     {
         var emailAlreadyExists = await authenticationRepository.GetByEmailAsync(email);
         if (emailAlreadyExists is not null)
@@ -23,14 +23,7 @@ public class AuthenticationService(IAuthenticationRepository authenticationRepos
         var hashedPassword = Password.FromHash(passwordHasher.Hash(password));
 
         var entity = Account.Register(username, email, hashedPassword);
-        authenticationRepository.Register(entity);
-
-        var success = await authenticationRepository.UnitOfWork.Commit();
-        if (!success)
-            throw new Exception("Something went wrong");
-
-        await bus.PublishEvent(new NewAccountRegisteredEvent(entity.Id, entity.Email.Value, entity.Username.Value));
-        return true;
+        return entity;
     }
 
     public async Task<bool> LoginAsync(string email, string password)
