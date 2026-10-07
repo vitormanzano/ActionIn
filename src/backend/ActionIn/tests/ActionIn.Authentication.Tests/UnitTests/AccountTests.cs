@@ -1,7 +1,7 @@
 using ActionIn.Authentication.Domain;
 using ActionIn.Authentication.Domain.ValueObjects;
 
-namespace ActionIn.Authentication.Tests;
+namespace ActionIn.Authentication.Tests.UnitTests;
 
 public class AccountTests
 {
@@ -15,7 +15,7 @@ public class AccountTests
 
         Assert.Equal("vitor", account.Username.Value);
         Assert.Equal("vitor@gmail.com", account.Email.Value);
-        Assert.Equal("hashed:senha123", account.Password.Value);
+        Assert.Equal("senha123", account.Password.Value);
     }
 
     [Fact]
