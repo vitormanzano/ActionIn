@@ -1,7 +1,6 @@
 ﻿using ActionIn.Core.DomainObjects;
-using Xunit;
 
-namespace ActionIn.Core.Tests;
+namespace ActionIn.Core.Tests.UnitTests;
 
 public class EntityTests
 {

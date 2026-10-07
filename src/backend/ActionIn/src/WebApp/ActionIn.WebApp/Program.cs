@@ -10,6 +10,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddCustomServices();
 builder.Services.AddDbContext(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.Mediator();
+builder.Services.AddCustomCommands();
 
 var app = builder.Build();
 

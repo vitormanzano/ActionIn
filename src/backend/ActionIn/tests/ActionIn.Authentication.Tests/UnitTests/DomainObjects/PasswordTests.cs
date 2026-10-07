@@ -1,7 +1,6 @@
-namespace ActionIn.Authentication.Tests.DomainObjects;
+using ActionIn.Authentication.Domain.ValueObjects;
 
-using Domain.ValueObjects;
-using Xunit;
+namespace ActionIn.Authentication.Tests.UnitTests.DomainObjects;
 
 public class PasswordTests
 {

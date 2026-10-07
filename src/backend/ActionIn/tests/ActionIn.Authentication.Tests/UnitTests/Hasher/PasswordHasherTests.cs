@@ -1,7 +1,6 @@
-namespace ActionIn.Authentication.Tests.Hasher;
+using ActionIn.Authentication.Domain.Hasher;
 
-using Domain.Hasher;
-using Xunit;
+namespace ActionIn.Authentication.Tests.UnitTests.Hasher;
 
 public class PasswordHasherTests
 {
