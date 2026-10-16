@@ -34,7 +34,7 @@ public static class ServiceExtensions
 
         services.AddMediatR(cfg =>
             {
-                cfg.RegisterServicesFromAssembly(typeof(MediatrHandler).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommandHandler).Assembly);
             });
 
         return services;
