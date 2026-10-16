@@ -1,15 +1,15 @@
+using MediatR;
+
 namespace ActionIn.Core.Messages.Commands;
 
-public interface ICommandHandler<in TCommand>
-    where TCommand : ICommand
+public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand, bool>
+    where TCommand : Command
 {
     // Use Result pattern
-    Task<bool> Handle(TCommand command, CancellationToken cancellationToken);
 }
 
-public interface ICommandHandler<in TCommand, TResponse>
-    where TCommand : ICommand<TResponse>
+public interface ICommandHandler<in TCommand, TResponse> : IRequestHandler<TCommand, TResponse>
+    where TCommand : Command<TResponse>
 {
-    Task<TResponse> Handle(TCommand command, CancellationToken cancellationToken);
 }
 
