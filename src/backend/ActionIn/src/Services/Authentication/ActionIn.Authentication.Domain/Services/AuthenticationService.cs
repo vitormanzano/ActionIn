@@ -6,7 +6,7 @@ using ActionIn.Core.Mediatr;
 
 namespace ActionIn.Authentication.Domain.Services;
 
-public class AuthenticationService(IAuthenticationRepository authenticationRepository, IPasswordHasher passwordHasher, IMediatrHandler bus) : IAuthenticationService
+public class AuthenticationService(IAuthenticationRepository authenticationRepository, IPasswordHasher passwordHasher) : IAuthenticationService
 {
     public async Task<Account> RegisterAsync(string username, string email, string password)
     {
@@ -22,8 +22,7 @@ public class AuthenticationService(IAuthenticationRepository authenticationRepos
 
         var hashedPassword = Password.FromHash(passwordHasher.Hash(password));
 
-        var entity = Account.Register(username, email, hashedPassword);
-        return entity;
+        return Account.Register(username, email, hashedPassword);
     }
 
     public async Task<bool> LoginAsync(string email, string password)
