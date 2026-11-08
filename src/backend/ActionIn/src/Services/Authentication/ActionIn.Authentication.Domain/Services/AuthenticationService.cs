@@ -1,8 +1,6 @@
-using ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 using ActionIn.Authentication.Domain.Hasher;
 using ActionIn.Authentication.Domain.Repository;
 using ActionIn.Authentication.Domain.ValueObjects;
-using ActionIn.Core.Mediatr;
 
 namespace ActionIn.Authentication.Domain.Services;
 
