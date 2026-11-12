@@ -1,3 +1,6 @@
 Using xh
 
-xh 
+xh POST http://localhost:5199/Authentication/Register \
+  username="vitor" \
+  email="vitor@example.com" \
+  password="Secret123"
