@@ -12,6 +12,7 @@ builder.Services.AddCustomServices();
 builder.Services.AddDbContext(builder.Configuration.GetConnectionString("DefaultConnection"));
 builder.Services.Mediator();
 builder.Services.AddCustomCommands();
+builder.Services.AddSmtp(builder.Configuration);
 
 var app = builder.Build();
 

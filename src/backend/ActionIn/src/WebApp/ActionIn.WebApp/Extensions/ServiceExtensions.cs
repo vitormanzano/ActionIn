@@ -1,7 +1,10 @@
+using ActionIn.Authentication.AntiCorruption;
 using ActionIn.Authentication.Application.Commands.RegisterAccount;
 using ActionIn.Authentication.Data;
 using ActionIn.Authentication.Data.Repository;
+using ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 using ActionIn.Authentication.Domain.Hasher;
+using ActionIn.Authentication.Domain.Notifications;
 using ActionIn.Authentication.Domain.Repository;
 using ActionIn.Authentication.Domain.Services;
 using ActionIn.Core.Mediatr;
@@ -35,6 +38,7 @@ public static class ServiceExtensions
         services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommandHandler).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(NewAccountRegisteredEvent).Assembly);
             });
 
         return services;
@@ -43,6 +47,14 @@ public static class ServiceExtensions
     public static IServiceCollection AddCustomCommands(this IServiceCollection services)
     {
         services.AddScoped<ICommandHandler<RegisterAccountCommand>, RegisterAccountCommandHandler>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSmtp(this IServiceCollection services, ConfigurationManager configuration)
+    {
+        services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
+        services.AddScoped<IEmailSender, EmailSender>();
 
         return services;
     }

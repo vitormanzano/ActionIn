@@ -21,5 +21,6 @@
         <ProjectReference Include="..\..\Services\Authentication\ActionIn.Authentication.Application\ActionIn.Authentication.Application.csproj" />
         <ProjectReference Include="..\..\Services\Authentication\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
         <ProjectReference Include="..\..\Services\Authentication\ActionIn.Authentication.Data\ActionIn.Authentication.Data.csproj" />
+        <ProjectReference Include="..\..\Services\Authentication\ActionIn.Authentication.AntiCorruption\ActionIn.Authentication.AntiCorruption.csproj" />
     </ItemGroup>
 </Project>
