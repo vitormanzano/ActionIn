@@ -1,15 +1,24 @@
+using ActionIn.Authentication.Domain.Notifications;
+using ActionIn.Authentication.Domain.ValueObjects;
 using MediatR;
 
 namespace ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 
-public class NewAccountRegisteredEventHandler : INotificationHandler<NewAccountRegisteredEvent>
+public class NewAccountRegisteredEventHandler(IEmailSender emailSender) : INotificationHandler<NewAccountRegisteredEvent>
 {
 
     public async Task Handle(NewAccountRegisteredEvent message, CancellationToken cancellationToken)
     {
-        // Send email to the email
-        // In the future, this should happen first than the transaction, if the email is delivered
-        // Then we made the transaction, by command or a query.
+        var welcomeEmail = EmailMessage.Welcome(new Email(message.Email), message.Username);
+
+        try
+        {
+            await emailSender.SendAsync(welcomeEmail, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 }
 
