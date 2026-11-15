@@ -9,7 +9,12 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddCustomServices();
-builder.Services.AddDbContext(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+
+builder.Services.AddDbContext(connectionString);
+
 builder.Services.Mediator();
 builder.Services.AddCustomCommands();
 builder.Services.AddSmtp(builder.Configuration);

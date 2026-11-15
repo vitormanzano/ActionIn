@@ -63,3 +63,6 @@ Desktop.ini
 .DS_Store
 
 **/.idea
+
+**/docs/roadmap/
+**/docs/ROADMAP_PROMPT.md
