@@ -7,9 +7,18 @@ on:
   pull_request:
     branches: ["main"]
 
+# Cancel previous runs of the same branch/PR if a new push arrives
+# before the current run finishes – saves Actions minutes.
+concurrency:
+  group: ci-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/backend/ActionIn/
     steps:
       - uses: actions/checkout@v6
       - name: Setup dotnet 10
@@ -17,7 +26,7 @@ jobs:
         with:
           global-json-file: src/backend/ActionIn/global.json
       - name: Install dependencies
-        run: dotnet restore src/backend/ActionIn/ActionIn.slnx
+        run: dotnet restore ActionIn.slnx
       - name: Build
         run: dotnet build --no-restore -warnaserror
       - name: Test with the dotnet CLI
