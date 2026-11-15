@@ -1,0 +1,24 @@
+name: ci
+run-name: ActionIn CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup dotnet 10
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: src/backend/ActionIn/global.json
+      - name: Install dependencies
+        run: dotnet restore src/backend/ActionIn/ActionIn.slnx
+      - name: Build
+        run: dotnet build --no-restore -warnaserror
+      - name: Test with the dotnet CLI
+        run: dotnet test --no-build
