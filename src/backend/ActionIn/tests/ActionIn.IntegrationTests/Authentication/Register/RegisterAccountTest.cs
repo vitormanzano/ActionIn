@@ -40,6 +40,28 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         var exists = await context.Accounts.AnyAsync(a => a.Email.Value == request.Email);
         Assert.True(exists);
     }
+
+    [Fact]
+    public async Task Register_DuplicatedEmail_ThrowsException()
+    {
+        // Characterization: today the API throws on a duplicated e-mail.
+        var request = CreateRequest();
+        var client = _factory.CreateClient();
+
+        var firstResponse = await client.PostAsJsonAsync(RegisterAccountUrl, request);
+        Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
+
+        var exception = await Assert.ThrowsAsync<Exception>(
+                () => client.PostAsJsonAsync(RegisterAccountUrl, request));
+
+        Assert.Equal("Email already exists", exception.Message);
+
+        await using var context = postgres.CreateDbContext();
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Value == request.Email);
+        Assert.Equal(1, accounts);
+
+        Assert.Single(_factory.EmailSender.SentMessages);
+    }
 }
 
 

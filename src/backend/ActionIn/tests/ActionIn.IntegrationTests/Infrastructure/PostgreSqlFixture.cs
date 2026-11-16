@@ -19,9 +19,9 @@ public class PostgreSqlFixture : IAsyncLifetime
 
         return new AuthenticationContext(options);
     }
-
     public async Task CleanTableAccountsAsync()
     {
+
         await _postgres.ExecScriptAsync("DELETE FROM \"Accounts\"");
     }
 
