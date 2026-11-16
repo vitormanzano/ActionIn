@@ -11,6 +11,8 @@
     <PackageReference Include="NetArchTest.Rules" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="TestContainers.PostgreSql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,5 +23,6 @@
     <ProjectReference Include="..\..\src\Services\Authentication\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
     <ProjectReference Include="..\..\src\Services\Authentication\ActionIn.Authentication.Data\ActionIn.Authentication.Data.csproj" />
     <ProjectReference Include="..\..\src\Services\Authentication\ActionIn.Authentication.Application\ActionIn.Authentication.Application.csproj" />
+    <ProjectReference Include="..\..\src\WebApp\ActionIn.WebApp\ActionIn.WebApp.csproj" />
   </ItemGroup>
 </Project>
