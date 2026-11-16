@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;
 using ActionIn.Authentication.Application.Dtos;
@@ -11,7 +12,7 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     private const string RegisterAccountUrl = "/Authentication/Register";
     private readonly IntegrationTestWebAppFactory _factory = new(postgres.ConnectionString);
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync() => postgres.CleanTableAccountsAsync();
 
     public async Task DisposeAsync() => await _factory.DisposeAsync();
 
@@ -22,7 +23,7 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Success()
+    public async Task Register_ShouldInsertANewAccount_AndSendAnEmail()
     {
         var request = CreateRequest();
         var client = _factory.CreateClient();
@@ -33,6 +34,11 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         var email = Assert.Single(_factory.EmailSender.SentMessages);
 
         Assert.Equal(request.Email, email.To.Value);
+
+        await using var context = postgres.CreateDbContext();
+
+        var exists = await context.Accounts.AnyAsync(a => a.Email.Value == request.Email);
+        Assert.True(exists);
     }
 }
 
