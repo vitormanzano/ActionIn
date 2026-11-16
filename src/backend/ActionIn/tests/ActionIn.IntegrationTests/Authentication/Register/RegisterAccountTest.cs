@@ -62,6 +62,28 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
 
         Assert.Single(_factory.EmailSender.SentMessages);
     }
+
+    [Theory]
+    [InlineData("v", "vi@gmail.com", "example123", "Username must be at least 4 characters")]
+    [InlineData("vitor", "invalid", "example123", "Email is not valid")]
+    [InlineData("vitor", "vi@gmail.com", "abc", "Password must be at least 4 characters!")]
+    public async Task Register_InvalidPayload_ThrowsException(
+          string username, string email, string password, string expectedMessage)
+    {
+        var request = new RegisterAccountDto(username, email, password);
+        var client = _factory.CreateClient();
+
+        var exception = await Assert.ThrowsAsync<Exception>(
+                () => client.PostAsJsonAsync(RegisterAccountUrl, request));
+
+        Assert.Equal(expectedMessage, exception.Message);
+
+        await using var context = postgres.CreateDbContext();
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Value == request.Email);
+        Assert.Equal(0, accounts);
+
+        Assert.Empty(_factory.EmailSender.SentMessages);
+    }
 }
 
 
