@@ -25,7 +25,7 @@ public class PostgreSqlFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _postgres.DisposeAsync().AsTask();
+        await _postgres.DisposeAsync();
     }
 }
 
