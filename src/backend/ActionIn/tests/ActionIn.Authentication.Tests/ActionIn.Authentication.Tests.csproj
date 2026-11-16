@@ -11,8 +11,6 @@
     <PackageReference Include="NetArchTest.Rules" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-    <PackageReference Include="TestContainers.PostgreSql" />
   </ItemGroup>
 
   <ItemGroup>
