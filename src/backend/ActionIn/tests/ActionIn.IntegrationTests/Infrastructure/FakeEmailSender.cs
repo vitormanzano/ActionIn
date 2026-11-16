@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using ActionIn.Authentication.Domain.Notifications;
 
 namespace ActionIn.IntegrationTests.Infrastructure;

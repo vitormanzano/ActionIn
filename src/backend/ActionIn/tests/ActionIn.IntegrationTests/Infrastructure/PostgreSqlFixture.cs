@@ -11,21 +11,33 @@ public class PostgreSqlFixture : IAsyncLifetime
 
     public string ConnectionString => _postgres.GetConnectionString();
 
-    public async Task InitializeAsync()
+    public AuthenticationContext CreateDbContext()
     {
-        await _postgres.StartAsync();
-
         var options = new DbContextOptionsBuilder<AuthenticationContext>()
             .UseNpgsql(ConnectionString)
             .Options;
 
-        await using var context = new AuthenticationContext(options);
+        return new AuthenticationContext(options);
+    }
+
+    public async Task CleanTableAccountsAsync()
+    {
+        await _postgres.ExecScriptAsync("DELETE FROM \"Accounts\"");
+    }
+
+    public async Task InitializeAsync()
+    {
+        await _postgres.StartAsync();
+
+
+        await using var context = CreateDbContext();
         await context.Database.MigrateAsync();
     }
 
     public async Task DisposeAsync()
     {
         await _postgres.DisposeAsync();
+
     }
 }
 
