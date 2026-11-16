@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.IntegrationTests.Infrastructure;
@@ -28,8 +29,10 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
 
         var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
 
-        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var email = Assert.Single(_factory.EmailSender.SentMessages);
 
+        Assert.Equal(request.Email, email.To.Value);
     }
 }
 

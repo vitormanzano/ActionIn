@@ -1,4 +1,3 @@
-using ActionIn.Authentication.AntiCorruption;
 using ActionIn.Authentication.Domain.Notifications;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
