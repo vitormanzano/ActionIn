@@ -6,10 +6,13 @@ public class EntityTests
 {
     private class FakeEntity : Entity
     {
+        public FakeEntity() { }
+        public FakeEntity(Guid id) : base(id) { }
     }
 
     private class AnotherFakeEntity : Entity
     {
+        public AnotherFakeEntity(Guid id) : base(id) { }
     }
 
     [Fact]
@@ -24,16 +27,6 @@ public class EntityTests
     {
         var entity = new FakeEntity();
         var result = entity.Equals(entity);
-        Assert.True(result);
-    }
-
-    [Fact]
-    public void Equals_SameIdDifferentInstance_ReturnsTrue()
-    {
-        var entity1 = new FakeEntity();
-        var entity2 = new FakeEntity { Id = entity1.Id };
-
-        var result = entity1.Equals(entity2);
         Assert.True(result);
     }
 
@@ -56,13 +49,13 @@ public class EntityTests
     }
 
     [Fact]
-    public void Equals_DifferentTypeSameId_ReturnsTrue()
+    public void Equals_DifferentTypeSameId_ReturnsFalse()
     {
         var entity1 = new FakeEntity();
-        var entity2 = new AnotherFakeEntity { Id = entity1.Id };
+        var entity2 = new AnotherFakeEntity(entity1.Id);
 
         var result = entity1.Equals(entity2);
-        Assert.True(result);
+        Assert.False(result);
     }
 
     [Fact]
@@ -79,7 +72,7 @@ public class EntityTests
     public void EqualityOperator_BothNonNullSameId_ReturnsTrue()
     {
         var entity1 = new FakeEntity();
-        var entity2 = new FakeEntity { Id = entity1.Id };
+        var entity2 = new FakeEntity(entity1.Id);
 
         var result = entity1 == entity2;
         Assert.True(result);
@@ -106,16 +99,6 @@ public class EntityTests
     }
 
     [Fact]
-    public void EqualityOperator_SameId_ReturnsTrue()
-    {
-        var entity1 = new FakeEntity();
-        var entity2 = new FakeEntity { Id = entity1.Id };
-
-        var result = entity1 == entity2;
-        Assert.True(result);
-    }
-
-    [Fact]
     public void InequalityOperator_DifferentId_ReturnsTrue()
     {
         var entity1 = new FakeEntity();
@@ -129,7 +112,7 @@ public class EntityTests
     public void InequalityOperator_SameId_ReturnsFalse()
     {
         var entity1 = new FakeEntity();
-        var entity2 = new FakeEntity { Id = entity1.Id };
+        var entity2 = new FakeEntity(entity1.Id);
 
         var result = entity1 != entity2;
         Assert.False(result);
@@ -139,7 +122,7 @@ public class EntityTests
     public void GetHashCode_SameId_ReturnsSameHashCode()
     {
         var entity1 = new FakeEntity();
-        var entity2 = new FakeEntity { Id = entity1.Id };
+        var entity2 = new FakeEntity(entity1.Id);
 
         var hashCode1 = entity1.GetHashCode();
         var hashCode2 = entity2.GetHashCode();

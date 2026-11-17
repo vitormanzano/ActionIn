@@ -2,11 +2,16 @@ namespace ActionIn.Core.DomainObjects;
 
 public abstract class Entity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; }
 
     protected Entity()
     {
         Id = Guid.NewGuid();
+    }
+
+    protected Entity(Guid id)
+    {
+        Id = id;
     }
 
     public override bool Equals(object? obj)
@@ -15,6 +20,7 @@ public abstract class Entity
 
         if (ReferenceEquals(this, compareTo)) return true;
         if (ReferenceEquals(null, compareTo)) return false;
+        if (GetType() != compareTo.GetType()) return false;
 
         return Id.Equals(compareTo.Id);
     }

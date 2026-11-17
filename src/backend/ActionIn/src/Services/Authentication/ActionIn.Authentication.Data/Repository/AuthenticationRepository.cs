@@ -31,9 +31,4 @@ public class AuthenticationRepository(AuthenticationContext context) : IAuthenti
             .FirstOrDefaultAsync(a => a.Email.Value == normalized);
 
     }
-
-    public void Dispose()
-    {
-        context.Dispose();
-    }
 }
