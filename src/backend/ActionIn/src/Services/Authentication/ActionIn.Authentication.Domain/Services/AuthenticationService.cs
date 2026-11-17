@@ -37,11 +37,6 @@ public class AuthenticationService(IAuthenticationRepository authenticationRepos
 
         return true;
     }
-
-    public void Dispose()
-    {
-        authenticationRepository?.Dispose();
-    }
 }
 
 
