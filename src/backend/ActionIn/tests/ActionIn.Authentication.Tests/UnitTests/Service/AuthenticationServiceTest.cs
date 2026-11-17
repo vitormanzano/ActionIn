@@ -36,7 +36,7 @@ public class AuthenticationServiceTest
     [Theory]
     [InlineData("vit@example.com", "Secret123", "Wrong credentials!")]
     [InlineData("vitor@example.com", "Secret1234", "Wrong credentials!")]
-    public async Task Login_InvalidCredentials_ReturnsFalse(
+    public async Task Login_InvalidCredentials_ThrowsException(
             string attemptedEmail, string attemptedPassword, string expectedMessage)
     {
         var registeredEmail = "vitor@example.com";
