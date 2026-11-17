@@ -32,6 +32,27 @@ public class AuthenticationServiceTest
         var exists = await _service.LoginAsync(email, password);
         Assert.True(exists);
     }
+
+    [Theory]
+    [InlineData("vit@example.com", "Secret123", "Wrong credentials!")]
+    [InlineData("vitor@example.com", "Secret1234", "Wrong credentials!")]
+    public async Task Login_InvalidCredentials_ReturnsFalse(
+            string attemptedEmail, string attemptedPassword, string expectedMessage)
+    {
+        var registeredEmail = "vitor@example.com";
+        var registeredPassword = "Secret123";
+        var hashedPassword = _passwordHasher.Hash(registeredPassword);
+
+
+        var account = Account.Register("vitor", registeredEmail, Password.FromHash(hashedPassword));
+        _repository.Register(account);
+
+        var exception = await Assert.ThrowsAsync<Exception>(
+                () => _service.LoginAsync(attemptedEmail, attemptedPassword)
+                );
+
+        Assert.Equal(expectedMessage, exception.Message);
+    }
 }
 
 

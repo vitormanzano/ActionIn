@@ -33,7 +33,7 @@ public class AuthenticationService(IAuthenticationRepository authenticationRepos
         var isPasswordValid = passwordHasher.Verify(password: password, hashedPassword: existingAccount.Password.Value);
 
         if (!isPasswordValid)
-            throw new Exception("Wrong credentials");
+            throw new Exception("Wrong credentials!");
 
         return true;
     }
