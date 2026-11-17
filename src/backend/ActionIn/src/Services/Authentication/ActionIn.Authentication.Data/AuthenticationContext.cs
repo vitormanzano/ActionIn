@@ -19,8 +19,8 @@ public class AuthenticationContext(DbContextOptions<AuthenticationContext> optio
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthenticationContext).Assembly);
     }
-    public async Task<bool> Commit()
+    public async Task<bool> Commit(CancellationToken cancellationToken)
     {
-        return await base.SaveChangesAsync() > 0;
+        return await base.SaveChangesAsync(cancellationToken) > 0;
     }
 }

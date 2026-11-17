@@ -13,7 +13,7 @@ public class RegisterAccountCommandHandler(IAuthenticationService authentication
         var entity = await authenticationService.RegisterAsync(command.Account.Username, command.Account.Email, command.Account.Password);
 
         authenticationRepository.Register(entity);
-        var success = await authenticationRepository.UnitOfWork.Commit();
+        var success = await authenticationRepository.UnitOfWork.Commit(cancellationToken);
         if (!success)
             throw new Exception("Something went wrong");
 
