@@ -31,16 +31,6 @@ public class EntityTests
     }
 
     [Fact]
-    public void Equals_SameIdDifferentInstance_ReturnsTrue()
-    {
-        var entity1 = new FakeEntity();
-        var entity2 = new AnotherFakeEntity(entity1.Id);
-
-        var result = entity1.Equals(entity2);
-        Assert.True(result);
-    }
-
-    [Fact]
     public void Equals_DifferentId_ReturnsFalse()
     {
         var entity1 = new FakeEntity();

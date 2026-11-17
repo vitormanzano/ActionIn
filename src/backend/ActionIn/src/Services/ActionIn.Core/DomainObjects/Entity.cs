@@ -20,6 +20,7 @@ public abstract class Entity
 
         if (ReferenceEquals(this, compareTo)) return true;
         if (ReferenceEquals(null, compareTo)) return false;
+        if (GetType() != compareTo.GetType()) return false;
 
         return Id.Equals(compareTo.Id);
     }
