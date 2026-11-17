@@ -12,6 +12,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/ActionIn.Authentication.Tests/ActionIn.Authentication.Tests.csproj" />
     <Project Path="tests/ActionIn.Core.Tests/ActionIn.Core.Tests.csproj" />
+    <Project Path="tests/ActionIn.IntegrationTests/ActionIn.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/src/WebApp/">
     <Project Path="src/WebApp/ActionIn.WebApp/ActionIn.WebApp.csproj" />

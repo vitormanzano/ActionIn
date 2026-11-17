@@ -5,8 +5,8 @@ volumes:
 
 services:
   postgres:
-    container_name: ActionInBackend
-    image: postgres
+    container_name: ActionInPostgres
+    image: postgres:18
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

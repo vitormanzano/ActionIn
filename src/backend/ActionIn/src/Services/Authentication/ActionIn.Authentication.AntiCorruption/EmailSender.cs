@@ -12,8 +12,10 @@ public class EmailSender(IOptions<SmtpSettings> options) : IEmailSender
     public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
         var mime = new MimeMessage();
+
         mime.From.Add(new MailboxAddress(_settings.FromName, _settings.FromAddress));
         mime.To.Add(MailboxAddress.Parse(message.To.Value));
+
         mime.Subject = message.Subject;
         mime.Body = new BodyBuilder { HtmlBody = message.Body }.ToMessageBody();
 
