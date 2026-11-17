@@ -26,7 +26,7 @@ public class AuthenticationRepositoryInMemory : IAuthenticationRepository
         var normalized = new Email(email).Value;
 
         return Accounts
-            .FirstOrDefault(a => a.Email.Value == email);
+            .FirstOrDefault(a => a.Email.Value == normalized);
     }
 
     public void Dispose()
