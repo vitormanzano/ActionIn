@@ -25,5 +25,4 @@ public class AccountTests
 
         Assert.Throws<Exception>(() => Account.Register("abc", "vitor@gmail.com", password));
     }
-
 }
