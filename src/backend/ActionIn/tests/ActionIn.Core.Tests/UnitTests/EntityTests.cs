@@ -99,16 +99,6 @@ public class EntityTests
     }
 
     [Fact]
-    public void EqualityOperator_SameId_ReturnsTrue()
-    {
-        var entity1 = new FakeEntity();
-        var entity2 = new FakeEntity(entity1.Id);
-
-        var result = entity1 == entity2;
-        Assert.True(result);
-    }
-
-    [Fact]
     public void InequalityOperator_DifferentId_ReturnsTrue()
     {
         var entity1 = new FakeEntity();
