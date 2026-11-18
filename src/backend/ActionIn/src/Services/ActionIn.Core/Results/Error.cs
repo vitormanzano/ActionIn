@@ -25,8 +25,8 @@ public sealed record Error
     }
     public static Error Failure(string code, string message)
         => new(code, message, ErrorType.Failure, []);
-    public static Error Validation(string code, string message, IEnumerable<FieldError> fieldErrors)
-        => new(code, message, ErrorType.Validation, [.. fieldErrors]);
+    public static Error Validation(string code, string message, IEnumerable<FieldError>? fieldErrors)
+        => new(code, message, ErrorType.Validation, fieldErrors is null ? [] : [.. fieldErrors]);
     public static Error NotFound(string code, string message)
         => new(code, message, ErrorType.NotFound, []);
     public static Error Conflict(string code, string message)
@@ -35,6 +35,8 @@ public sealed record Error
         => new(code, message, ErrorType.Unauthorized, []);
     public static Error Forbidden(string code, string message)
         => new(code, message, ErrorType.Forbidden, []);
+
+    public FieldError ForField(string field) => new(field, Code, Message);
 }
 
 
