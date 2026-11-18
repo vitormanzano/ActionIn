@@ -1,4 +1,4 @@
-# 1.  Extract Services From the Application
+# 6.  Extract Services From the Application
 
 Date: 2026-10-05
 
