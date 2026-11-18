@@ -25,7 +25,7 @@ public sealed record Error
     }
     public static Error Failure(string code, string message)
         => new(code, message, ErrorType.Failure, []);
-    public static Error Validation(string code, string message, IEnumerable<FieldError>? fieldErrors)
+    public static Error Validation(string code, string message, IEnumerable<FieldError>? fieldErrors = null)
         => new(code, message, ErrorType.Validation, fieldErrors is null ? [] : [.. fieldErrors]);
     public static Error NotFound(string code, string message)
         => new(code, message, ErrorType.NotFound, []);
