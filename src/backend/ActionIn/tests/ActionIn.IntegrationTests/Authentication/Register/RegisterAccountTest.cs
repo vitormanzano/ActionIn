@@ -64,9 +64,9 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("v", "vi@gmail.com", "example123", "Username must be at least 4 characters")]
-    [InlineData("vitor", "invalid", "example123", "Email is not valid")]
-    [InlineData("vitor", "vi@gmail.com", "abc", "Password must be at least 4 characters!")]
+    [InlineData("v", "vi@gmail.com", "example123", "Username must have at least 4 characters.")]
+    [InlineData("vitor", "invalid", "example123", "Email format is invalid.")]
+    [InlineData("vitor", "vi@gmail.com", "abc", "Password must have at least 4 characters.")]
     public async Task Register_InvalidPayload_ThrowsException(
           string username, string email, string password, string expectedMessage)
     {
