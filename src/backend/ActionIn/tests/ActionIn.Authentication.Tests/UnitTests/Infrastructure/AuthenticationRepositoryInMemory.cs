@@ -23,7 +23,7 @@ public class AuthenticationRepositoryInMemory : IAuthenticationRepository
     }
     public async Task<Account?> GetByEmailAsync(string email)
     {
-        var normalized = new Email(email).Value;
+        var normalized = Email.Create(email).Value.Value;
 
         return Accounts
             .FirstOrDefault(a => a.Email.Value == normalized);

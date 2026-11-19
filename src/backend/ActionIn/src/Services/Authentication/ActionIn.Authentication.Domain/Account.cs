@@ -1,6 +1,5 @@
 using ActionIn.Core.DomainObjects;
 using ActionIn.Authentication.Domain.ValueObjects;
-using ActionIn.Authentication.Domain.Hasher;
 
 namespace ActionIn.Authentication.Domain;
 
@@ -18,7 +17,7 @@ public class Account : Entity, IAggregateRoot
         return new Account
         {
             Username = new Username(username),
-            Email = new Email(email),
+            Email = Email.Create(email).Value,
             Password = password
         };
     }
