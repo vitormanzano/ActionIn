@@ -61,7 +61,7 @@ public class PasswordTests
     [Fact]
     public void Create_PasswordWithMaxLengthCharacters_ReturnsSuccess()
     {
-        string password = new('a', Password.HashMaxLength);
+        string password = new('a', Password.MaxLength);
         Result<Password> result = Password.Create(password, _hasher);
         Assert.True(result.IsSuccess);
     }
@@ -69,7 +69,7 @@ public class PasswordTests
     [Fact]
     public void Create_PasswordLongerThanMaxLengthCharacters_ReturnsFailure()
     {
-        string password = new('a', Password.HashMaxLength + 1);
+        string password = new('a', Password.MaxLength + 1);
         Result<Password> result = Password.Create(password, _hasher);
         Assert.True(result.IsFailure);
         Assert.Equal(AuthenticationErrors.Password.TooLong.Code, result.Error.Code);
