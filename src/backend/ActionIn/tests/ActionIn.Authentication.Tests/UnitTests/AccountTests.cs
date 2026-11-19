@@ -15,7 +15,7 @@ public class AccountTests
 
         Assert.Equal("vitor", account.Username.Value);
         Assert.Equal("vitor@gmail.com", account.Email.Value);
-        Assert.Equal("senha123", account.Password.Value);
+        Assert.Equal("senha123", account.Password.Hash);
     }
 
     [Fact]
