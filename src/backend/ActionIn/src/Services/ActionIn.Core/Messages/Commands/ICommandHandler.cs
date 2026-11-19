@@ -1,14 +1,14 @@
+using ActionIn.Core.Results;
 using MediatR;
 
 namespace ActionIn.Core.Messages.Commands;
 
-public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand, bool>
+public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand, Result>
     where TCommand : Command
 {
-    // Use Result pattern
 }
 
-public interface ICommandHandler<in TCommand, TResponse> : IRequestHandler<TCommand, TResponse>
+public interface ICommandHandler<in TCommand, TResponse> : IRequestHandler<TCommand, Result<TResponse>>
     where TCommand : Command<TResponse>
 {
 }
