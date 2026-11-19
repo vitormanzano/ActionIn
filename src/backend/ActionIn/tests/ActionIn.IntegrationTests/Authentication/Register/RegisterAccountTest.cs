@@ -33,11 +33,11 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var email = Assert.Single(_factory.EmailSender.SentMessages);
 
-        Assert.Equal(request.Email, email.To.Value);
+        Assert.Equal(request.Email, email.To.Address);
 
         await using var context = postgres.CreateDbContext();
 
-        var exists = await context.Accounts.AnyAsync(a => a.Email.Value == request.Email);
+        var exists = await context.Accounts.AnyAsync(a => a.Email.Address == request.Email);
         Assert.True(exists);
     }
 
@@ -57,16 +57,16 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         Assert.Equal("Email already exists", exception.Message);
 
         await using var context = postgres.CreateDbContext();
-        var accounts = await context.Accounts.CountAsync(a => a.Email.Value == request.Email);
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
         Assert.Equal(1, accounts);
 
         Assert.Single(_factory.EmailSender.SentMessages);
     }
 
     [Theory]
-    [InlineData("v", "vi@gmail.com", "example123", "Username must be at least 4 characters")]
-    [InlineData("vitor", "invalid", "example123", "Email is not valid")]
-    [InlineData("vitor", "vi@gmail.com", "abc", "Password must be at least 4 characters!")]
+    [InlineData("v", "vi@gmail.com", "example123", "Username must have at least 4 characters.")]
+    [InlineData("vitor", "invalid", "example123", "Email format is invalid.")]
+    [InlineData("vitor", "vi@gmail.com", "abc", "Password must have at least 4 characters.")]
     public async Task Register_InvalidPayload_ThrowsException(
           string username, string email, string password, string expectedMessage)
     {
@@ -79,7 +79,7 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         Assert.Equal(expectedMessage, exception.Message);
 
         await using var context = postgres.CreateDbContext();
-        var accounts = await context.Accounts.CountAsync(a => a.Email.Value == request.Email);
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
         Assert.Equal(0, accounts);
 
         Assert.Empty(_factory.EmailSender.SentMessages);

@@ -1,3 +1,5 @@
+using ActionIn.Core.Results;
+
 namespace ActionIn.Authentication.Domain.Services;
 
 public interface IAuthenticationService

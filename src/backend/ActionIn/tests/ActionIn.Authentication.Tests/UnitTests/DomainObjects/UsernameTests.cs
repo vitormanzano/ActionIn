@@ -1,54 +1,166 @@
+using ActionIn.Authentication.Domain.Errors;
 using ActionIn.Authentication.Domain.ValueObjects;
+using ActionIn.Core.Results;
 
 namespace ActionIn.Authentication.Tests.UnitTests.DomainObjects;
 
 public class UsernameTests
 {
     [Fact]
-    public void Constructor_ValidUsername_SetsValue()
+    public void Create_ValidUsername_ReturnsSuccess()
     {
-        var username = new Username("vitor");
+        Result<Username> result = Username.Create("vitor");
 
-        Assert.Equal("vitor", username.Value);
-    }
-
-    [Fact]
-    public void Constructor_UsernameIsNull_ThrowsException()
-    {
-        Assert.Throws<Exception>(() => new Username(null!));
+        Assert.True(result.IsSuccess);
+        Assert.Equal("vitor", result.Value.Text);
     }
 
     [Theory]
-    [InlineData("")]
-    [InlineData("abc")]
-    public void Constructor_UsernameShorterThanFourCharacters_ThrowsException(string username)
+    [InlineData("  vitor   ")]
+    [InlineData("vitor  ")]
+    [InlineData("  vitor")]
+    public void Create_UsernameWithSurroundingSpaces_TrimsSpaces(string username)
     {
-        Assert.Throws<Exception>(() => new Username(username));
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("vitor", result.Value.Text);
+    }
+
+    [Theory]
+    [InlineData("vitor_123")]
+    [InlineData("vitor.m")]
+    [InlineData("vitor-m")]
+    [InlineData("vitor123")]
+    [InlineData("1234")]
+    [InlineData("VITOR")]
+    public void Create_UsernameWithAllowedCharacters_ReturnsSuccess(string username)
+    {
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(username, result.Value.Text);
+    }
+
+    [Theory]
+    [InlineData("vitor#")]
+    [InlineData("vitor$")]
+    [InlineData("vi   tor")]
+    [InlineData("joão")]
+    [InlineData("vitor@m")]
+    public void Create_UsernameWithInvalidCharacters_ReturnsFailure(string username)
+    {
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Username.InvalidCharacter.Code, result.Error.Code);
     }
 
     [Fact]
-    public void Constructor_UsernameWithFourCharacters_DoesNotThrow()
+    public void Create_UsernameTooShortWithInvalidCharacter_ReturnsTooShort()
     {
-        var exception = Record.Exception(() => new Username("abcd"));
+        string username = new string('a', Username.MinLength - 2) + '#';
 
-        Assert.Null(exception);
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Username.TooShort.Code, result.Error.Code);
+    }
+
+    [Fact]
+    public void Create_UsernameTooLongWithInvalidCharacter_ReturnsTooLong()
+    {
+        string username = new string('a', Username.MaxLength) + '#';
+
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Username.TooLong.Code, result.Error.Code);
+    }
+
+
+    [Fact]
+    public void Create_MixedCaseUsername_PreservesCase()
+    {
+        string username = "Vitor";
+
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(username, result.Value.Text);
+    }
+
+    [Theory]
+    [InlineData("   ")]
+    [InlineData(null)]
+    [InlineData("")]
+    public void Create_UsernameIsEmpty_ReturnsFailure(string? username)
+    {
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Username.Empty.Code, result.Error.Code);
+    }
+
+    [Fact]
+    public void Create_UsernameShorterThanMinLength_ReturnsFailure()
+    {
+        string username = new('a', Username.MinLength - 1);
+
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Username.TooShort.Code, result.Error.Code);
+    }
+
+    [Fact]
+    public void Create_UsernameWithMinLength_ReturnsSuccess()
+    {
+        string username = new('a', Username.MinLength);
+
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(username, result.Value.Text);
+    }
+
+    [Fact]
+    public void Create_UsernameWithMaxLength_ReturnsSuccess()
+    {
+        string username = new('a', Username.MaxLength);
+
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(username, result.Value.Text);
+    }
+
+    [Fact]
+    public void Create_UsernameLargerThanMaxLength_ReturnsFailure()
+    {
+        string username = new('a', Username.MaxLength + 1);
+
+        Result<Username> result = Username.Create(username);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Username.TooLong.Code, result.Error.Code);
     }
 
     [Fact]
     public void Equals_SameValue_ReturnsTrue()
     {
-        var a = new Username("vitor");
-        var b = new Username("vitor");
+        Result<Username> resultA = Username.Create("vitor");
+        Result<Username> resultB = Username.Create("vitor");
 
-        Assert.Equal(a, b);
+        Assert.Equal(resultA.Value, resultB.Value);
     }
 
     [Fact]
     public void Equals_DifferentValue_ReturnsFalse()
     {
-        var a = new Username("vitor");
-        var b = new Username("manzano");
+        Result<Username> resultA = Username.Create("vitor");
+        Result<Username> resultB = Username.Create("manzano");
 
-        Assert.NotEqual(a, b);
+        Assert.NotEqual(resultA.Value, resultB.Value);
     }
 }

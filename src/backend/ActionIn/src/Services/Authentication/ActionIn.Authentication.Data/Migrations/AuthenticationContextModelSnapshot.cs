@@ -17,7 +17,7 @@ namespace ActionIn.Authentication.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -40,15 +40,15 @@ namespace ActionIn.Authentication.Data.Migrations
                             b1.Property<Guid>("AccountId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("Value")
+                            b1.Property<string>("Address")
                                 .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("varchar(100)")
+                                .HasMaxLength(254)
+                                .HasColumnType("character varying(254)")
                                 .HasColumnName("email");
 
                             b1.HasKey("AccountId");
 
-                            b1.HasIndex("Value")
+                            b1.HasIndex("Address")
                                 .IsUnique();
 
                             b1.ToTable("Accounts");
@@ -62,10 +62,10 @@ namespace ActionIn.Authentication.Data.Migrations
                             b1.Property<Guid>("AccountId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("Value")
+                            b1.Property<string>("Hash")
                                 .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("varchar(100)")
+                                .HasMaxLength(128)
+                                .HasColumnType("character varying(128)")
                                 .HasColumnName("password");
 
                             b1.HasKey("AccountId");
@@ -81,15 +81,15 @@ namespace ActionIn.Authentication.Data.Migrations
                             b1.Property<Guid>("AccountId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("Value")
+                            b1.Property<string>("Text")
                                 .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("varchar(100)")
+                                .HasMaxLength(30)
+                                .HasColumnType("character varying(30)")
                                 .HasColumnName("username");
 
                             b1.HasKey("AccountId");
 
-                            b1.HasIndex("Value")
+                            b1.HasIndex("Text")
                                 .IsUnique();
 
                             b1.ToTable("Accounts");

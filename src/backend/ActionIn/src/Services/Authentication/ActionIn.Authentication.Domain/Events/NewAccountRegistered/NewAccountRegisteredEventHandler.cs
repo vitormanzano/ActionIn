@@ -9,7 +9,7 @@ public class NewAccountRegisteredEventHandler(IEmailSender emailSender) : INotif
 
     public async Task Handle(NewAccountRegisteredEvent message, CancellationToken cancellationToken)
     {
-        var welcomeEmail = EmailMessage.Welcome(new Email(message.Email), message.Username);
+        var welcomeEmail = EmailMessage.Welcome(Email.Create(message.Email).Value, message.Username);
 
         try
         {
