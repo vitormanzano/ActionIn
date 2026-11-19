@@ -19,7 +19,7 @@ public class AuthenticationRepository(AuthenticationContext context) : IAuthenti
     {
         return await context.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Username.Value == username);
+            .FirstOrDefaultAsync(a => a.Username.Text == username);
     }
 
     public async Task<Account?> GetByEmailAsync(string email)

@@ -2,7 +2,7 @@ namespace ActionIn.Authentication.Domain.ValueObjects;
 
 public record Username
 {
-    public string Value { get; private set; } = string.Empty;
+    public string Text { get; private set; } = string.Empty;
 
     private Username() { }
 
@@ -14,7 +14,7 @@ public record Username
     public void SetUsername(string username)
     {
         ValidateUsername(username);
-        Value = username;
+        Text = username;
     }
 
     private void ValidateUsername(string username)

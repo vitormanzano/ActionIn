@@ -19,7 +19,7 @@ public class AuthenticationRepositoryInMemory : IAuthenticationRepository
     public async Task<Account?> GetByUsernameAsync(string username)
     {
         return Accounts
-            .FirstOrDefault(a => a.Username.Value == username);
+            .FirstOrDefault(a => a.Username.Text == username);
     }
     public async Task<Account?> GetByEmailAsync(string email)
     {

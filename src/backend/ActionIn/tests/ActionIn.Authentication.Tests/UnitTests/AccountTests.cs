@@ -13,7 +13,7 @@ public class AccountTests
 
         var account = Account.Register("vitor", "vitor@gmail.com", password);
 
-        Assert.Equal("vitor", account.Username.Value);
+        Assert.Equal("vitor", account.Username.Text);
         Assert.Equal("vitor@gmail.com", account.Email.Value);
         Assert.Equal("senha123", account.Password.Hash);
     }

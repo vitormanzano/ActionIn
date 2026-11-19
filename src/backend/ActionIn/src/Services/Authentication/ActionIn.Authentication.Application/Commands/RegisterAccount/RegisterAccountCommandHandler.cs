@@ -16,7 +16,7 @@ public class RegisterAccountCommandHandler(IAuthenticationService authentication
         await authenticationRepository.UnitOfWork.Commit(cancellationToken);
 
         // That event, will be throw by the entity later
-        await bus.PublishEvent(new NewAccountRegisteredEvent(entity.Id, entity.Email.Value, entity.Username.Value));
+        await bus.PublishEvent(new NewAccountRegisteredEvent(entity.Id, entity.Email.Value, entity.Username.Text));
         return true;
     }
 }
