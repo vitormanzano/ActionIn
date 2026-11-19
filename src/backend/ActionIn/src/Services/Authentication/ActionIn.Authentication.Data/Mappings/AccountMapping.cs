@@ -24,7 +24,7 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
         {
             b.Property(e => e.Address)
                 .HasColumnName("email")
-                .HasMaxLength(255)
+                .HasMaxLength(Email.MaxLength)
                 .IsRequired();
 
             b.HasIndex(u => u.Address).IsUnique();
@@ -33,7 +33,7 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
         builder.OwnsOne(a => a.Password)
             .Property(p => p.Hash)
             .HasColumnName("password")
-            .HasMaxLength(Password.HashMaxLength)
+            .HasMaxLength(Password.MaxLength)
             .IsRequired();
     }
 }
