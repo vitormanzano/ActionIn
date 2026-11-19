@@ -1,9 +1,12 @@
 using ActionIn.Core.DomainObjects;
 using ActionIn.Authentication.Domain.ValueObjects;
+using ActionIn.Core.Results;
+using ActionIn.Authentication.Domain.Hasher;
+using ActionIn.Authentication.Domain.Errors;
 
 namespace ActionIn.Authentication.Domain;
 
-public class Account : Entity, IAggregateRoot
+public sealed class Account : Entity, IAggregateRoot
 {
     public Username Username { get; private set; } = null!;
     public Email Email { get; private set; } = null!;
@@ -11,14 +14,36 @@ public class Account : Entity, IAggregateRoot
 
     private Account() { }
 
-    public static Account Register(string username, string email, Password password)
+    private Account(Username username, Email email, Password password)
     {
+        Username = username;
+        Email = email;
+        Password = password;
+    }
 
-        return new Account
-        {
-            Username = new Username(username),
-            Email = Email.Create(email).Value,
-            Password = password
-        };
+    public static Result<Account> Register(string? username,
+            string? email,
+            string? password,
+            IPasswordHasher passwordHasher)
+    {
+        Result<Username> usernameResult = Username.Create(username);
+        Result<Email> emailResult = Email.Create(email);
+        Result<Password> passwordResult = Password.Create(password, passwordHasher);
+
+        List<FieldError> fieldErrors = [];
+
+        if (usernameResult.IsFailure)
+            fieldErrors.Add(usernameResult.Error.ForField(nameof(Username)));
+
+        if (emailResult.IsFailure)
+            fieldErrors.Add(emailResult.Error.ForField(nameof(Email)));
+
+        if (passwordResult.IsFailure)
+            fieldErrors.Add(passwordResult.Error.ForField(nameof(Password)));
+
+        if (fieldErrors.Count > 0)
+            return Result<Account>.Failure(AuthenticationErrors.Account.InvalidData(fieldErrors));
+
+        return Result<Account>.Success(new Account(usernameResult.Value, emailResult.Value, passwordResult.Value));
     }
 }
