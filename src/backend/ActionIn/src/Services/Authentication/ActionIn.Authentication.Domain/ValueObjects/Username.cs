@@ -1,27 +1,53 @@
+using System.Text.RegularExpressions;
+using ActionIn.Authentication.Domain.Errors;
+using ActionIn.Core.Results;
+
 namespace ActionIn.Authentication.Domain.ValueObjects;
 
-public record Username
+public sealed partial record Username
 {
-    public string Text { get; private set; } = string.Empty;
+    public const int MinLength = 4;
+    public const int MaxLength = 30;
+    public string Text { get; private init; } = string.Empty;
 
     private Username() { }
 
-    public Username(string username)
+    private Username(string username)
     {
-        SetUsername(username);
-    }
-
-    public void SetUsername(string username)
-    {
-        ValidateUsername(username);
         Text = username;
     }
 
-    private void ValidateUsername(string username)
+    public static Result<Username> Create(string? username)
     {
-        if (username is null)
-            throw new Exception("Username cannot be null"); // Use notifications + result pattern
-        if (username.Length < 4)
-            throw new Exception("Username must be at least 4 characters");
+        string normalizedUsername = Normalize(username);
+
+        Result validation = Validate(normalizedUsername);
+        if (validation.IsFailure)
+            return Result<Username>.Failure(validation.Error);
+
+        return Result<Username>.Success(new Username(normalizedUsername));
     }
+
+    private static string Normalize(string? username)
+        => username?.Trim() ?? string.Empty;
+
+    private static Result Validate(string username)
+    {
+        if (username.Length == 0)
+            return Result.Failure(AuthenticationErrors.Username.Empty);
+
+        if (username.Length < MinLength)
+            return Result.Failure(AuthenticationErrors.Username.TooShort);
+
+        if (username.Length > MaxLength)
+            return Result.Failure(AuthenticationErrors.Username.TooLong);
+
+        if (!AllowedCharacters().IsMatch(username))
+            return Result.Failure(AuthenticationErrors.Username.InvalidCharacter);
+
+        return Result.Success();
+    }
+
+    [GeneratedRegex(@"^[a-zA-Z0-9._-]+\z", RegexOptions.None, matchTimeoutMilliseconds: 100)]
+    private static partial Regex AllowedCharacters();
 }
