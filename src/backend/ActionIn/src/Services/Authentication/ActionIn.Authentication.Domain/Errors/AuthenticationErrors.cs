@@ -21,6 +21,9 @@ public static class AuthenticationErrors
         public static readonly Error Empty =
             Error.Validation("Username.Empty", "Username is required.");
 
+        public static readonly Error InvalidCharacter =
+            Error.Validation("Username.InvalidCharacters", "Username can only contain letters without accents, numbers, '.', '_' and '-'.");
+
         public static readonly Error TooShort =
             Error.Validation("Username.TooShort", "Username must have at least 4 characters.");
 
