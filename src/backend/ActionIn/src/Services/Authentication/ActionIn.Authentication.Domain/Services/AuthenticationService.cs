@@ -30,7 +30,7 @@ public class AuthenticationService(IAuthenticationRepository authenticationRepos
         if (existingAccount is null)
             throw new Exception("Wrong credentials!");
 
-        var isPasswordValid = passwordHasher.Verify(password: password, hashedPassword: existingAccount.Password.Value);
+        var isPasswordValid = passwordHasher.Verify(password: password, hashedPassword: existingAccount.Password.Hash);
 
         if (!isPasswordValid)
             throw new Exception("Wrong credentials!");

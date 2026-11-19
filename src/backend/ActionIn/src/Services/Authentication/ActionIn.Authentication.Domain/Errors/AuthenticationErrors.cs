@@ -28,6 +28,18 @@ public static class AuthenticationErrors
             Error.Validation("Username.TooLong", "Username is too long.");
     }
 
+    public static class Password
+    {
+        public static readonly Error Empty =
+        Error.Validation("Password.Empty", "Password is required.");
+
+        public static readonly Error TooShort =
+            Error.Validation("Password.TooShort", "Password must have at least 4 characters.");
+
+        public static readonly Error TooLong =
+            Error.Validation("Password.TooLong", "Password is too long.");
+    }
+
     public static class Account
     {
         public static Error InvalidData(IEnumerable<FieldError> fieldErrors) =>
