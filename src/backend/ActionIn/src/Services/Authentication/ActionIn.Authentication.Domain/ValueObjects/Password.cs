@@ -7,7 +7,13 @@ namespace ActionIn.Authentication.Domain.ValueObjects;
 public sealed record Password
 {
     public const int MinLength = 4;
-    public const int MaxLength = 128; // Password larger than that will run with 100000 iterations
+
+    /// <summary>
+    /// Maximum length of the plain-text password. Rejects oversized input before
+    /// it reaches the hasher (PBKDF2, 100k iterations), so a single request cannot
+    /// burn CPU. Not related to the stored hash or the database column.
+    /// </summary>
+    public const int MaxLength = 128;
     public string Hash { get; private init; } = string.Empty;
 
     private Password() { }
