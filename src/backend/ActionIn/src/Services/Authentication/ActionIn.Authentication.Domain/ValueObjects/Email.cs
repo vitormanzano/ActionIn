@@ -1,32 +1,49 @@
 using System.Text.RegularExpressions;
+using ActionIn.Authentication.Domain.Errors;
+using ActionIn.Core.Results;
 
 namespace ActionIn.Authentication.Domain.ValueObjects;
 
-public record Email
+public sealed partial record Email
 {
-    public string Value { get; private set; } = string.Empty;
+    public const int MaxLength = 254;
+    public string Value { get; private init; } = string.Empty;
 
     private Email() { }
 
-    public Email(string email)
+    private Email(string email)
     {
-        SetEmail(email);
+        Value = email;
     }
 
-    public void SetEmail(string email)
+    public static Result<Email> Create(string? email)
     {
-        if (!EmailIsValid(email))
-            throw new Exception("Email is not valid");
-        Value = email.Trim().ToLowerInvariant();
+        string normalizedEmail = Normalize(email);
 
+        Result validation = Validate(normalizedEmail);
+        if (validation.IsFailure)
+            return Result<Email>.Failure(validation.Error);
+
+        return Result<Email>.Success(new Email(normalizedEmail));
     }
 
-    private static bool EmailIsValid(string email)
+    private static string Normalize(string? email)
+        => email?.Trim().ToLowerInvariant() ?? string.Empty;
+    private static Result Validate(string email)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            return false;
+        if (email.Length == 0)
+            return Result.Failure(AuthenticationErrors.Email.Empty);
 
-        return Regex.IsMatch(email,
-                   @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+        if (email.Length > MaxLength)
+            return Result.Failure(AuthenticationErrors.Email.TooLong);
+
+        if (!EmailFormat().IsMatch(email))
+            return Result.Failure(AuthenticationErrors.Email.InvalidFormat);
+
+        return Result.Success();
     }
+
+    [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.None, matchTimeoutMilliseconds: 100)]
+    private static partial Regex EmailFormat();
+
 }

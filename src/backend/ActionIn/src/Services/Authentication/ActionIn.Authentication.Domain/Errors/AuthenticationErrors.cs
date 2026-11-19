@@ -6,6 +6,9 @@ public static class AuthenticationErrors
 {
     public static class Email
     {
+        public static readonly Error Empty =
+            Error.Validation("Email.Empty", "Email is required.");
+
         public static readonly Error InvalidFormat =
             Error.Validation("Email.InvalidFormat", "Email format is invalid.");
 
@@ -15,6 +18,9 @@ public static class AuthenticationErrors
 
     public static class Username
     {
+        public static readonly Error Empty =
+            Error.Validation("Username.Empty", "Username is required.");
+
         public static readonly Error TooShort =
             Error.Validation("Username.TooShort", "Username must have at least 4 characters.");
 
