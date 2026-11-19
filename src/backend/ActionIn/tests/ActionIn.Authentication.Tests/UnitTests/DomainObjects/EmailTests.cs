@@ -1,3 +1,4 @@
+using ActionIn.Authentication.Domain.Errors;
 using ActionIn.Authentication.Domain.ValueObjects;
 
 namespace ActionIn.Authentication.Tests.UnitTests.DomainObjects;
@@ -5,46 +6,87 @@ namespace ActionIn.Authentication.Tests.UnitTests.DomainObjects;
 public class EmailTests
 {
     [Fact]
-    public void Constructor_ValidEmail_SetsValue()
+    public void Create_ValidEmail_CreateNewEmail()
     {
-        var email = new Email("vitor@gmail.com");
-        Assert.Equal("vitor@gmail.com", email.Value);
-    }
-
-    [Fact]
-    public void Constructor_EmailIsNull_ThrowsException()
-    {
-        Assert.Throws<Exception>(() => new Email(null!));
-
+        var result = Email.Create("vitor@example.com");
+        Assert.True(result.IsSuccess);
+        Assert.Equal("vitor@example.com", result.Value.Value);
     }
 
     [Theory]
-    [InlineData("@gmail.com")]
-    [InlineData("a@gmail.com@gmail")]
+    [InlineData("         vitor@example.com   ", "vitor@example.com")]
+    [InlineData("Vitor@example.com", "vitor@example.com")]
+    public void Create_NormalizeEmail_ReturnsTrimAndLowerEmail(string email, string expected)
+    {
+        var result = Email.Create(email);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(expected, result.Value.Value);
+    }
+
+    [Fact]
+    public void Create_EmailIsNull_ReturnsFailure()
+    {
+        var result = Email.Create(null);
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.Empty.Code, result.Error.Code);
+    }
+
+    [Fact]
+    public void Create_EmailIsEmpty_ReturnsFailure()
+    {
+        var result = Email.Create("");
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.Empty.Code, result.Error.Code);
+    }
+
+    [Fact]
+    public void Create_EmailWithMaxLengthCharacters_ReturnsSuccess()
+    {
+        const string domain = "@example.com";
+        string email = new string('a', Email.MaxLength - domain.Length) + domain;
+        var result = Email.Create(email);
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public void Create_EmailLongerThanMaxLengthCharacters_ReturnsFailure()
+    {
+        const string domain = "@example.com";
+        string email = new string('a', Email.MaxLength - domain.Length + 1) + domain;
+        var result = Email.Create(email);
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.TooLong.Code, result.Error.Code);
+    }
+
+
+    [Theory]
+    [InlineData("@example.com")]
+    [InlineData("a@example.com@gmail")]
     [InlineData("a.com@gmail")]
     [InlineData("a.com")]
     [InlineData("a@gmail")]
-    [InlineData(" ")]
-    public void Constructor_EmailIsInvalid_ThrowsException(string email)
+    public void Create_EmailIsInvalid_ReturnsFailure(string email)
     {
-        Assert.Throws<Exception>(() => new Email(email));
+        var result = Email.Create(email);
+        Assert.True(result.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.InvalidFormat.Code, result.Error.Code);
     }
 
     [Fact]
-    public void Equals_SameValue_ReturnsTrue()
+    public void Equals_SameValue_IsEqual()
     {
-        var a = new Email("vitor@gmail.com");
-        var b = new Email("vitor@gmail.com");
+        var resultA = Email.Create("vitor@example.com");
+        var resultB = Email.Create("vitor@example.com");
 
-        Assert.Equal(a, b);
+        Assert.Equal(resultA.Value, resultB.Value);
     }
 
     [Fact]
-    public void Equals_DifferentValue_ReturnsFalse()
+    public void Equals_DifferentValue_IsNotEqual()
     {
-        var a = new Email("vitor@gmail.com");
-        var b = new Email("manzano@gmail.com");
+        var resultA = Email.Create("vitor@example.com");
+        var resultB = Email.Create("manzano@example.com");
 
-        Assert.NotEqual(a, b);
+        Assert.NotEqual(resultA.Value, resultB.Value);
     }
 }
