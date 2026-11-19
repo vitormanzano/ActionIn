@@ -13,7 +13,7 @@ public sealed record Password
     /// it reaches the hasher (PBKDF2, 100k iterations), so a single request cannot
     /// burn CPU. Not related to the stored hash or the database column.
     /// </summary>
-    public const int MaxLength = 128;
+    public const int HashMaxLength = 128;
     public string Hash { get; private init; } = string.Empty;
 
     private Password() { }
@@ -43,7 +43,7 @@ public sealed record Password
         if (password.Length < MinLength)
             return Result.Failure(AuthenticationErrors.Password.TooShort);
 
-        if (password.Length > MaxLength)
+        if (password.Length > HashMaxLength)
             return Result.Failure(AuthenticationErrors.Password.TooLong);
 
         return Result.Success();

@@ -33,7 +33,7 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
         builder.OwnsOne(a => a.Password)
             .Property(p => p.Hash)
             .HasColumnName("password")
-            .HasMaxLength(Password.MaxLength)
+            .HasMaxLength(Password.HashMaxLength)
             .IsRequired();
     }
 }
