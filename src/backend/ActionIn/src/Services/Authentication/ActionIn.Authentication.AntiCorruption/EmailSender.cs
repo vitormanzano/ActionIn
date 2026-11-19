@@ -14,7 +14,7 @@ public class EmailSender(IOptions<SmtpSettings> options) : IEmailSender
         var mime = new MimeMessage();
 
         mime.From.Add(new MailboxAddress(_settings.FromName, _settings.FromAddress));
-        mime.To.Add(MailboxAddress.Parse(message.To.Value));
+        mime.To.Add(MailboxAddress.Parse(message.To.Address));
 
         mime.Subject = message.Subject;
         mime.Body = new BodyBuilder { HtmlBody = message.Body }.ToMessageBody();

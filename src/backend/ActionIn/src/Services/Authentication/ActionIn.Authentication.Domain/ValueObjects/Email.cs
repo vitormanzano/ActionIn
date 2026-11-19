@@ -7,13 +7,13 @@ namespace ActionIn.Authentication.Domain.ValueObjects;
 public sealed partial record Email
 {
     public const int MaxLength = 254;
-    public string Value { get; private init; } = string.Empty;
+    public string Address { get; private init; } = string.Empty;
 
     private Email() { }
 
     private Email(string email)
     {
-        Value = email;
+        Address = email;
     }
 
     public static Result<Email> Create(string? email)

@@ -22,12 +22,12 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
 
         builder.OwnsOne(a => a.Email, b =>
         {
-            b.Property(e => e.Value)
+            b.Property(e => e.Address)
                 .HasColumnName("email")
                 .HasMaxLength(255)
                 .IsRequired();
 
-            b.HasIndex(u => u.Value).IsUnique();
+            b.HasIndex(u => u.Address).IsUnique();
         });
 
         builder.OwnsOne(a => a.Password)

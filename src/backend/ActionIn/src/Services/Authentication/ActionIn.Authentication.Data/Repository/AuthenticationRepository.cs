@@ -24,11 +24,11 @@ public class AuthenticationRepository(AuthenticationContext context) : IAuthenti
 
     public async Task<Account?> GetByEmailAsync(string email)
     {
-        var normalized = Email.Create(email).Value.Value;
+        var normalized = Email.Create(email).Value.Address;
 
         return await context.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Email.Value == normalized);
+            .FirstOrDefaultAsync(a => a.Email.Address == normalized);
 
     }
 }

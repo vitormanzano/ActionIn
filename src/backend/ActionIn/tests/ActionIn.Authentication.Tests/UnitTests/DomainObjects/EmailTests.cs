@@ -10,7 +10,7 @@ public class EmailTests
     {
         var result = Email.Create("vitor@example.com");
         Assert.True(result.IsSuccess);
-        Assert.Equal("vitor@example.com", result.Value.Value);
+        Assert.Equal("vitor@example.com", result.Value.Address);
     }
 
     [Theory]
@@ -20,7 +20,7 @@ public class EmailTests
     {
         var result = Email.Create(email);
         Assert.True(result.IsSuccess);
-        Assert.Equal(expected, result.Value.Value);
+        Assert.Equal(expected, result.Value.Address);
     }
 
     [Fact]
