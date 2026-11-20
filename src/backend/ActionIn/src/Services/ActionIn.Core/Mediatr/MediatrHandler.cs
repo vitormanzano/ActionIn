@@ -11,7 +11,7 @@ public class MediatrHandler(IMediator mediator) : IMediatrHandler
         await mediator.Publish(e);
     }
 
-    public Task<TResponse> SendCommand<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken)
+    public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken)
         => mediator.Send(request, cancellationToken);
 
 

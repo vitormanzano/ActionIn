@@ -14,9 +14,9 @@ public class AuthenticationController(IMediatrHandler sender) : ControllerBase
     {
         var command = new RegisterAccountCommand(accountDto);
 
-        var result = await sender.SendCommand(command, cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
 
-        if (result)
+        if (result.IsSuccess)
             return Created();
 
         return BadRequest();

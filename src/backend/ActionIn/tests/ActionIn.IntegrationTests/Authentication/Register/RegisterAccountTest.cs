@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Http.Json;
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.IntegrationTests.Infrastructure;
+using ActionIn.Core.Results;
+using ActionIn.Authentication.Domain;
 
 namespace ActionIn.IntegrationTests.Authentication.Register;
 
@@ -42,7 +44,7 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Register_DuplicatedEmail_ThrowsException()
+    public async Task Register_DuplicatedEmail_ReturnsFailure()
     {
         // Characterization: today the API throws on a duplicated e-mail.
         var request = CreateRequest();
@@ -51,10 +53,9 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         var firstResponse = await client.PostAsJsonAsync(RegisterAccountUrl, request);
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
 
-        var exception = await Assert.ThrowsAsync<Exception>(
-                () => client.PostAsJsonAsync(RegisterAccountUrl, request));
+        var secondResponse = await client.PostAsJsonAsync(RegisterAccountUrl, request);
 
-        Assert.Equal("Email already exists", exception.Message);
+        Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
 
         await using var context = postgres.CreateDbContext();
         var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
@@ -64,19 +65,18 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("v", "vi@gmail.com", "example123", "Username must have at least 4 characters.")]
-    [InlineData("vitor", "invalid", "example123", "Email format is invalid.")]
-    [InlineData("vitor", "vi@gmail.com", "abc", "Password must have at least 4 characters.")]
-    public async Task Register_InvalidPayload_ThrowsException(
-          string username, string email, string password, string expectedMessage)
+    [InlineData("v", "vi@gmail.com", "example123")]
+    [InlineData("vitor", "invalid", "example123")]
+    [InlineData("vitor", "vi@gmail.com", "abc")]
+    public async Task Register_InvalidPayload_ReturnsFailure(
+          string username, string email, string password)
     {
         var request = new RegisterAccountDto(username, email, password);
         var client = _factory.CreateClient();
 
-        var exception = await Assert.ThrowsAsync<Exception>(
-                () => client.PostAsJsonAsync(RegisterAccountUrl, request));
+        var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
 
-        Assert.Equal(expectedMessage, exception.Message);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
         await using var context = postgres.CreateDbContext();
         var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
