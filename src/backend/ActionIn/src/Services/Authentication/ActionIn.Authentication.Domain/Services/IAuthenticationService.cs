@@ -5,7 +5,7 @@ namespace ActionIn.Authentication.Domain.Services;
 public interface IAuthenticationService
 {
     Task<Result<Account>> RegisterAsync(string username, string email, string password);
-    Task<bool> LoginAsync(string email, string password);
+    Task<Result> LoginAsync(string email, string password);
 }
 
 

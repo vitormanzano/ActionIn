@@ -54,6 +54,9 @@ public static class AuthenticationErrors
     {
         public static Error InvalidData(IEnumerable<FieldError> fieldErrors) =>
             Error.Validation("Account.InvalidData", "Account data is invalid.", fieldErrors);
+
+        public static readonly Error InvalidCredentials =
+            Error.Unauthorized("Account.InvalidCredentials", "Invalid credentials.");
     }
 }
 
