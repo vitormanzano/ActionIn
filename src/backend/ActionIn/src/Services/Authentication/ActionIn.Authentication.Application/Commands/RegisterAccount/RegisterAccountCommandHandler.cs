@@ -11,7 +11,7 @@ public class RegisterAccountCommandHandler(IAuthenticationService authentication
 {
     public async Task<Result> Handle(RegisterAccountCommand command, CancellationToken cancellationToken)
     {
-        var entity = await authenticationService.RegisterAsync(command.Account.Username, command.Account.Email, command.Account.Password);
+        var entity = await authenticationService.RegisterAsync(command.Username, command.Email, command.Password);
 
         if (entity.IsFailure)
             return Result.Failure(entity.Error);
