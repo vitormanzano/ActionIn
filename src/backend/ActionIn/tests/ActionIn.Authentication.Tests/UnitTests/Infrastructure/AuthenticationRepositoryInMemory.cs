@@ -1,6 +1,5 @@
 using ActionIn.Authentication.Domain;
 using ActionIn.Authentication.Domain.Repository;
-using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Core.Data;
 
 namespace ActionIn.Authentication.Tests.UnitTests.Infrastructure;
@@ -23,10 +22,8 @@ public class AuthenticationRepositoryInMemory : IAuthenticationRepository
     }
     public async Task<Account?> GetByEmailAsync(string email)
     {
-        var normalized = Email.Create(email).Value.Address;
-
         return Accounts
-            .FirstOrDefault(a => a.Email.Address == normalized);
+            .FirstOrDefault(a => a.Email.Address == email);
     }
 }
 
