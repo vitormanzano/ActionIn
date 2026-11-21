@@ -11,15 +11,18 @@ public class RegisterAccountCommandHandler(IAuthenticationService authentication
 {
     public async Task<Result> Handle(RegisterAccountCommand command, CancellationToken cancellationToken)
     {
-        var entity = await authenticationService.RegisterAsync(command.Username, command.Email, command.Password);
+        var registerResult = await authenticationService.RegisterAsync(command.Username, command.Email, command.Password);
 
-        if (entity.IsFailure)
-            return Result.Failure(entity.Error);
+        if (registerResult.IsFailure)
+            return Result.Failure(registerResult.Error);
 
-        var account = entity.Value;
+        var account = registerResult.Value;
 
         authenticationRepository.Register(account);
-        await authenticationRepository.UnitOfWork.Commit(cancellationToken);
+        var commitResult = await authenticationRepository.UnitOfWork.Commit(cancellationToken);
+
+        if (commitResult.IsFailure)
+            return commitResult;
 
         // That event, will be throw by the entity later
         await bus.PublishEvent(new NewAccountRegisteredEvent(account.Id, account.Email.Address, account.Username.Text));
