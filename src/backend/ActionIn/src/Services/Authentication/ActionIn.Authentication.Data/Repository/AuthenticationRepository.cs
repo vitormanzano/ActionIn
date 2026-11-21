@@ -1,6 +1,5 @@
 using ActionIn.Authentication.Domain;
 using ActionIn.Authentication.Domain.Repository;
-using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Core.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,11 +23,9 @@ public class AuthenticationRepository(AuthenticationContext context) : IAuthenti
 
     public async Task<Account?> GetByEmailAsync(string email)
     {
-        var normalized = Email.Create(email).Value.Address;
-
         return await context.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Email.Address == normalized);
+            .FirstOrDefaultAsync(a => a.Email.Address == email);
 
     }
 }

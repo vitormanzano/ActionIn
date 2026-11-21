@@ -1,12 +1,15 @@
 using ActionIn.Core.Messages;
-using ActionIn.Core.Messages.Commands;
+using MediatR;
 
 namespace ActionIn.Core.Mediatr;
 
 public interface IMediatrHandler
 {
     Task PublishEvent<T>(T e) where T : Event;
-    Task<bool> SendCommand<T>(T command, CancellationToken cancellationToken) where T : Command;
+
+    Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken);
 }
+
+
 
 

@@ -1,10 +1,11 @@
+using ActionIn.Core.Results;
+using MediatR;
+
 namespace ActionIn.Core.Messages.Query;
 
-public interface IQueryHandler<in TQuery, TResponse>
-    where TQuery : IQuery
+public interface IQueryHandler<in TQuery, TResponse> : IRequestHandler<TQuery, Result<TResponse>>
+    where TQuery : IQuery<TResponse>
 {
-    // Use result pattern
-    Task<TResponse> Handle(TQuery query, CancellationToken cancellationToken);
 }
 
 

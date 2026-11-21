@@ -1,5 +1,7 @@
 using ActionIn.Authentication.Domain;
+using ActionIn.Authentication.Domain.Errors;
 using ActionIn.Authentication.Domain.Services;
+using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Authentication.Tests.UnitTests.Infrastructure;
 using ActionIn.Core.Results;
 
@@ -29,28 +31,100 @@ public class AuthenticationServiceTest
     }
 
     [Fact]
-    public async Task Login_ValidCredentials_ReturnsTrue()
+    public async Task Login_ValidCredentials_ReturnsSuccess()
     {
         RegisterAccount();
 
-        bool loggedIn = await _service.LoginAsync(RegisteredEmail, RegisteredPassword);
+        Result loggedInResult = await _service.LoginAsync(RegisteredEmail, RegisteredPassword);
 
-        Assert.True(loggedIn);
+        Assert.True(loggedInResult.IsSuccess);
     }
 
     [Theory]
     [InlineData("vit@example.com", RegisteredPassword)]
     [InlineData(RegisteredEmail, "Secret1234")]
-    public async Task Login_InvalidCredentials_ThrowsException(
+    public async Task Login_InvalidCredentials_ReturnsFailure(
             string attemptedEmail, string attemptedPassword)
     {
         RegisterAccount();
 
-        var exception = await Assert.ThrowsAsync<Exception>(
-                () => _service.LoginAsync(attemptedEmail, attemptedPassword)
-                );
+        Result loggedInResult = await _service.LoginAsync(attemptedEmail, attemptedPassword);
 
-        Assert.Equal("Wrong credentials!", exception.Message);
+        Assert.True(loggedInResult.IsFailure);
+        Assert.Equal(AuthenticationErrors.Account.InvalidCredentials, loggedInResult.Error);
+    }
+
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("vi@gmail")]
+    [InlineData("vi.com")]
+    public async Task Login_InvalidEmail_ReturnsFailure(string email)
+    {
+        RegisterAccount();
+
+        Result loggedInResult = await _service.LoginAsync(email, RegisteredPassword);
+
+        Assert.True(loggedInResult.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.InvalidFormat, loggedInResult.Error);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("  ")]
+    public async Task Login_EmptyEmail_ReturnsFailure(string email)
+    {
+        RegisterAccount();
+
+        Result loggedInResult = await _service.LoginAsync(email, RegisteredPassword);
+
+        Assert.True(loggedInResult.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.Empty, loggedInResult.Error);
+    }
+
+    [Fact]
+    public async Task Login_ValidCredentialsWithNoAccountCreated_ReturnsFailure()
+    {
+        Result loggedInResult = await _service.LoginAsync(RegisteredEmail, RegisteredPassword);
+
+        Assert.True(loggedInResult.IsFailure);
+        Assert.Equal(AuthenticationErrors.Account.InvalidCredentials, loggedInResult.Error);
+    }
+
+    [Theory]
+    [InlineData("VITOR@EXAMPLE.COM")]
+    [InlineData("vitor@example.COM")]
+    public async Task Login_UppercaseValidEmail_ReturnsSuccess(string email)
+    {
+        RegisterAccount();
+
+        Result loggedInResult = await _service.LoginAsync(email, RegisteredPassword);
+
+        Assert.True(loggedInResult.IsSuccess);
+    }
+
+    [Theory]
+    [InlineData("      vitor@example.com      ")]
+    [InlineData("vitor@example.com      ")]
+    [InlineData("    vitor@example.com")]
+    public async Task Login_EmailWithSurroundingWhitespace_ReturnsSuccess(string email)
+    {
+        RegisterAccount();
+
+        Result loggedInResult = await _service.LoginAsync(email, RegisteredPassword);
+
+        Assert.True(loggedInResult.IsSuccess);
+    }
+
+    [Fact]
+    public async Task Login_TooLongEmail_ReturnsFailure()
+    {
+        const string domain = "@example.com";
+        string tooLongEmail = new string('a', Email.MaxLength + 1 - domain.Length) + domain;
+
+        Result loggedInResult = await _service.LoginAsync(tooLongEmail, RegisteredPassword);
+
+        Assert.True(loggedInResult.IsFailure);
+        Assert.Equal(AuthenticationErrors.Email.TooLong, loggedInResult.Error);
     }
 }
 

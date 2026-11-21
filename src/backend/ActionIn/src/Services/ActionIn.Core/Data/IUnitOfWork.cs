@@ -1,6 +1,8 @@
+using ActionIn.Core.Results;
+
 namespace ActionIn.Core.Data;
 
 public interface IUnitOfWork
 {
-    Task Commit(CancellationToken cancellationToken = default);
+    Task<Result> Commit(CancellationToken cancellationToken = default);
 }

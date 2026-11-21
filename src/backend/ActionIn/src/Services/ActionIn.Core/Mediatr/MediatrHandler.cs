@@ -11,10 +11,9 @@ public class MediatrHandler(IMediator mediator) : IMediatrHandler
         await mediator.Publish(e);
     }
 
-    public async Task<bool> SendCommand<T>(T command, CancellationToken cancellationToken) where T : Command
-    {
-        return await mediator.Send(command, cancellationToken);
-    }
+    public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken)
+        => mediator.Send(request, cancellationToken);
+
 
 }
 

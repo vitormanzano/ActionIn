@@ -7,6 +7,9 @@ namespace ActionIn.Authentication.Data.Mappings;
 
 public class AccountMapping : IEntityTypeConfiguration<Account>
 {
+    public const string EmailIndex = "IX_Accounts_email";
+    public const string UsernameIndex = "IX_Accounts_username";
+
     public void Configure(EntityTypeBuilder<Account> builder)
     {
         builder.HasKey(a => a.Id);
@@ -17,7 +20,9 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
                 .HasColumnName("username")
                 .HasMaxLength(Username.MaxLength)
                 .IsRequired();
-            b.HasIndex(u => u.Text).IsUnique();
+            b.HasIndex(u => u.Text)
+                .IsUnique()
+                .HasDatabaseName(UsernameIndex);
         });
 
         builder.OwnsOne(a => a.Email, b =>
@@ -27,7 +32,9 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
                 .HasMaxLength(Email.MaxLength)
                 .IsRequired();
 
-            b.HasIndex(u => u.Address).IsUnique();
+            b.HasIndex(u => u.Address)
+                .IsUnique()
+                .HasDatabaseName(EmailIndex);
         });
 
         builder.OwnsOne(a => a.Password)

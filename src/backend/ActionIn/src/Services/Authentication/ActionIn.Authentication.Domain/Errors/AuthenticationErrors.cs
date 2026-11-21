@@ -14,6 +14,10 @@ public static class AuthenticationErrors
 
         public static readonly Error TooLong =
             Error.Validation("Email.TooLong", "Email is too long.");
+
+        public static readonly Error AlreadyInUse =
+            Error.Conflict("Email.AlreadyInUse", "Email already in use.");
+
     }
 
     public static class Username
@@ -29,6 +33,9 @@ public static class AuthenticationErrors
 
         public static readonly Error TooLong =
             Error.Validation("Username.TooLong", "Username is too long.");
+
+        public static readonly Error AlreadyInUse =
+            Error.Conflict("Username.AlreadyInUse", "Username already in use.");
     }
 
     public static class Password
@@ -47,6 +54,9 @@ public static class AuthenticationErrors
     {
         public static Error InvalidData(IEnumerable<FieldError> fieldErrors) =>
             Error.Validation("Account.InvalidData", "Account data is invalid.", fieldErrors);
+
+        public static readonly Error InvalidCredentials =
+            Error.Unauthorized("Account.InvalidCredentials", "Invalid credentials.");
     }
 }
 

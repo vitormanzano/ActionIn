@@ -12,11 +12,11 @@ public class AuthenticationController(IMediatrHandler sender) : ControllerBase
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] RegisterAccountDto accountDto, CancellationToken cancellationToken)
     {
-        var command = new RegisterAccountCommand(accountDto);
+        var command = new RegisterAccountCommand(accountDto.Username, accountDto.Email, accountDto.Password);
 
-        var result = await sender.SendCommand(command, cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
 
-        if (result)
+        if (result.IsSuccess)
             return Created();
 
         return BadRequest();

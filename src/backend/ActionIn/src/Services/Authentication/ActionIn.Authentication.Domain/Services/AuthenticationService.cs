@@ -1,51 +1,53 @@
+using ActionIn.Authentication.Domain.Errors;
 using ActionIn.Authentication.Domain.Hasher;
 using ActionIn.Authentication.Domain.Repository;
+using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Core.Results;
 
 namespace ActionIn.Authentication.Domain.Services;
 
 public class AuthenticationService(IAuthenticationRepository authenticationRepository, IPasswordHasher passwordHasher) : IAuthenticationService
 {
-    public async Task<Account> RegisterAsync(string username, string email, string password)
+    public async Task<Result<Account>> RegisterAsync(string username, string email, string password)
     {
         Result<Account> result = Account.Register(username, email, password, passwordHasher);
 
         // Will be replaced for return fielderrors
         if (result.IsFailure)
-            throw new Exception(ToMessage(result.Error));
+            return Result<Account>.Failure(result.Error);
 
         Account account = result.Value;
 
         Account? emailOwner = await authenticationRepository.GetByEmailAsync(account.Email.Address);
         if (emailOwner is not null)
-            throw new Exception("Email already exists");
+            return Result<Account>.Failure(AuthenticationErrors.Email.AlreadyInUse);
 
         Account? usernameOwner = await authenticationRepository.GetByUsernameAsync(account.Username.Text);
         if (usernameOwner is not null)
-            throw new Exception("Username already exists");
+            return Result<Account>.Failure(AuthenticationErrors.Username.AlreadyInUse);
 
-        return account;
+        return Result<Account>.Success(account);
     }
 
-    public async Task<bool> LoginAsync(string email, string password)
+    public async Task<Result> LoginAsync(string email, string password)
     {
-        var existingAccount = await authenticationRepository.GetByEmailAsync(email);
+        var emailResult = Email.Create(email);
 
-        if (existingAccount is null)
-            throw new Exception("Wrong credentials!");
+        if (emailResult.IsFailure)
+            return Result.Failure(emailResult.Error);
 
-        var isPasswordValid = passwordHasher.Verify(password: password, hashedPassword: existingAccount.Password.Hash);
+        var account = await authenticationRepository.GetByEmailAsync(emailResult.Value.Address);
+
+        if (account is null)
+            return Result.Failure(AuthenticationErrors.Account.InvalidCredentials);
+
+        var isPasswordValid = passwordHasher.Verify(password: password, hashedPassword: account.Password.Hash);
 
         if (!isPasswordValid)
-            throw new Exception("Wrong credentials!");
+            return Result.Failure(AuthenticationErrors.Account.InvalidCredentials);
 
-        return true;
+        return Result.Success();
     }
-
-    private static string ToMessage(Error error)
-        => error.FieldErrors.Count == 0
-        ? error.Message
-        : string.Join(" ", error.FieldErrors.Select(f => f.Message));
 }
 
 
