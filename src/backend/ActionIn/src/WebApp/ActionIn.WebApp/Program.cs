@@ -1,3 +1,4 @@
+using ActionIn.WebApp.Exceptions;
 using ActionIn.WebApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddCustomServices();
 
+builder.Services.AddProblemDetails();
+
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
 
@@ -19,6 +22,8 @@ builder.Services.Mediator();
 builder.Services.AddCustomCommands();
 builder.Services.AddSmtp(builder.Configuration);
 
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +31,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+app.UseExceptionHandler();
+
+app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 

@@ -21,7 +21,6 @@ public class AuthenticationController(IMediatrHandler sender) : ControllerBase
 
         return BadRequest();
     }
-
 }
 
 
