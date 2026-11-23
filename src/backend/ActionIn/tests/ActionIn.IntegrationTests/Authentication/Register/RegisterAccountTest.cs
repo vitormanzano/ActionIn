@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Json;
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.IntegrationTests.Infrastructure;
-using ActionIn.Core.Results;
-using ActionIn.Authentication.Domain;
 
 namespace ActionIn.IntegrationTests.Authentication.Register;
 
@@ -12,6 +12,7 @@ namespace ActionIn.IntegrationTests.Authentication.Register;
 public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
 {
     private const string RegisterAccountUrl = "/Authentication/Register";
+    private const string ProblemJson = "application/problem+json";
     private readonly IntegrationTestWebAppFactory _factory = new(postgres.ConnectionString);
 
     public Task InitializeAsync() => postgres.CleanTableAccountsAsync();
@@ -44,18 +45,22 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Register_DuplicatedEmail_ReturnsFailure()
+    public async Task Register_DuplicatedEmail_ReturnsFailureWithConflictStatusCode()
     {
-        // Characterization: today the API throws on a duplicated e-mail.
         var request = CreateRequest();
         var client = _factory.CreateClient();
 
         var firstResponse = await client.PostAsJsonAsync(RegisterAccountUrl, request);
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
 
-        var secondResponse = await client.PostAsJsonAsync(RegisterAccountUrl, request);
+        var secondResponse = await client.PostAsJsonAsync(RegisterAccountUrl, request with { Username = "otheruser" });
 
-        Assert.Equal(HttpStatusCode.BadRequest, secondResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
+        Assert.Equal(ProblemJson, secondResponse.Content.Headers.ContentType?.MediaType);
+
+        var problem = await secondResponse.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal("Email.AlreadyInUse", problem.Extensions["code"]?.ToString());
 
         await using var context = postgres.CreateDbContext();
         var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
@@ -65,11 +70,11 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("v", "vi@gmail.com", "example123")]
-    [InlineData("vitor", "invalid", "example123")]
-    [InlineData("vitor", "vi@gmail.com", "abc")]
-    public async Task Register_InvalidPayload_ReturnsFailure(
-          string username, string email, string password)
+    [InlineData("v", "vi@gmail.com", "example123", "Username")]
+    [InlineData("vitor", "invalid", "example123", "Email")]
+    [InlineData("vitor", "vi@gmail.com", "abc", "Password")]
+    public async Task Register_InvalidPayload_ReturnsFailureWithBadRequestStatusCode(
+          string username, string email, string password, string invalidField)
     {
         var request = new RegisterAccountDto(username, email, password);
         var client = _factory.CreateClient();
@@ -77,6 +82,12 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(ProblemJson, response.Content.Headers.ContentType?.MediaType);
+
+        var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal("Account.InvalidData", problem.Extensions["code"]?.ToString());
+        Assert.Contains(invalidField, problem.Errors.Keys);
 
         await using var context = postgres.CreateDbContext();
         var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
