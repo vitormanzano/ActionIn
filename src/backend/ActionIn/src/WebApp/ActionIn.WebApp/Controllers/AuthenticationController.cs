@@ -1,6 +1,7 @@
 using ActionIn.Authentication.Application.Commands.RegisterAccount;
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.Core.Mediatr;
+using ActionIn.WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActionIn.WebApp.Controllers;
@@ -16,10 +17,7 @@ public class AuthenticationController(IMediatrHandler sender) : ControllerBase
 
         var result = await sender.Send(command, cancellationToken);
 
-        if (result.IsSuccess)
-            return Created();
-
-        return BadRequest();
+        return result.ToActionResult(this, () => Created());
     }
 }
 
