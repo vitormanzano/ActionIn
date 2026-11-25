@@ -23,7 +23,6 @@ public class CustomExceptionHandler(IProblemDetailsService problemDetailsService
             Title = "An error occurred",
         };
 
-
         return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
