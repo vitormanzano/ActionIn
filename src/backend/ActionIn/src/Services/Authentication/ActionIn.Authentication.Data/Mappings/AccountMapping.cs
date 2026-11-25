@@ -42,5 +42,7 @@ public class AccountMapping : IEntityTypeConfiguration<Account>
             .HasColumnName("password")
             .HasMaxLength(Password.MaxLength)
             .IsRequired();
+
+        builder.Ignore(u => u.DomainEvents);
     }
 }
