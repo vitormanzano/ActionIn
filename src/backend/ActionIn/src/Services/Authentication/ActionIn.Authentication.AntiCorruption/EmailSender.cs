@@ -1,4 +1,4 @@
-using ActionIn.Authentication.Domain.Notifications;
+using ActionIn.Authentication.Application.Notifications;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
@@ -14,7 +14,7 @@ public class EmailSender(IOptions<SmtpSettings> options) : IEmailSender
         var mime = new MimeMessage();
 
         mime.From.Add(new MailboxAddress(_settings.FromName, _settings.FromAddress));
-        mime.To.Add(MailboxAddress.Parse(message.To.Address));
+        mime.To.Add(MailboxAddress.Parse(message.To));
 
         mime.Subject = message.Subject;
         mime.Body = new BodyBuilder { HtmlBody = message.Body }.ToMessageBody();

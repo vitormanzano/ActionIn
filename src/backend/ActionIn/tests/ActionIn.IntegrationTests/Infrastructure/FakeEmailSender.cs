@@ -1,4 +1,4 @@
-using ActionIn.Authentication.Domain.Notifications;
+using ActionIn.Authentication.Application.Notifications;
 
 namespace ActionIn.IntegrationTests.Infrastructure;
 

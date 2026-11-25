@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Services\Authentication\ActionIn.Authentication.Data\ActionIn.Authentication.Data.csproj" />
     <ProjectReference Include="..\..\src\WebApp\ActionIn.WebApp\ActionIn.WebApp.csproj" />
+    <ProjectReference Include="..\..\src\Services\Core\ActionIn.Core.Infrastructure\ActionIn.Core.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

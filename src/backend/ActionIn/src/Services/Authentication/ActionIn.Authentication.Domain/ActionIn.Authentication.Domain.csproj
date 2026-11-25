@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\ActionIn.Core\ActionIn.Core.csproj" />
+    <ProjectReference Include="..\..\Core\ActionIn.Core\ActionIn.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 using ActionIn.Authentication.Application.Commands.RegisterAccount;
 using ActionIn.Authentication.Application.Dtos;
-using ActionIn.Core.Mediatr;
+using ActionIn.Core.Infrastructure.Mediatr;
 using ActionIn.WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc;
 

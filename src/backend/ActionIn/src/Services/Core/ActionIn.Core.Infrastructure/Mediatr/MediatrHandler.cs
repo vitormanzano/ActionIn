@@ -1,20 +1,15 @@
 using ActionIn.Core.Messages;
-using ActionIn.Core.Messages.Commands;
 using MediatR;
 
-namespace ActionIn.Core.Mediatr;
+namespace ActionIn.Core.Infrastructure.Mediatr;
 
 public class MediatrHandler(IMediator mediator) : IMediatrHandler
 {
-    public async Task PublishEvent<T>(T e) where T : Event
-    {
-        await mediator.Publish(e);
-    }
+    public Task PublishEvent<T>(T e, CancellationToken cancellationToken) where T : Event
+        => mediator.Publish(e, cancellationToken);
 
     public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken)
         => mediator.Send(request, cancellationToken);
-
-
 }
 
 

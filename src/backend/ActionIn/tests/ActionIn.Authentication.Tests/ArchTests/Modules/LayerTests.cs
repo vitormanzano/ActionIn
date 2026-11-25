@@ -2,6 +2,7 @@ using System.Reflection;
 using ActionIn.Authentication.Application.Commands.RegisterAccount;
 using ActionIn.Authentication.Data;
 using ActionIn.Authentication.Domain;
+using MediatR;
 using NetArchTest.Rules;
 
 namespace ActionIn.Authentication.Tests.ArchTests.Modules;
@@ -19,6 +20,42 @@ public class LayerTests
             .InAssembly(DomainAssembly)
             .ShouldNot()
             .HaveDependencyOnAny("ActionIn.Authentication.Application", "ActionIn.Authentication.Data")
+            .GetResult();
+
+        Assert.True(result.IsSuccessful);
+    }
+
+    [Fact]
+    public void DomainLayer_DoesNotHaveDependency_OnCoreInfrastructure()
+    {
+        var result = Types
+            .InAssembly(DomainAssembly)
+            .ShouldNot()
+            .HaveDependencyOn("ActionIn.Authentication.Infrastructure")
+            .GetResult();
+
+        Assert.True(result.IsSuccessful);
+    }
+
+    [Fact]
+    public void DomainLayer_DoesNotHave_NotificationsHandler()
+    {
+        var result = Types
+            .InAssembly(DomainAssembly)
+            .ShouldNot()
+            .ImplementInterface(typeof(INotificationHandler<>))
+            .GetResult();
+
+        Assert.True(result.IsSuccessful);
+    }
+
+    [Fact]
+    public void DomainLayer_DoesNotUse_MediatorSenderOrPublisher()
+    {
+        var result = Types
+            .InAssembly(DomainAssembly)
+            .ShouldNot()
+            .HaveDependencyOnAny("MediatR.IMediator", "MediatR.IPublisher", "MediatR.ISender")
             .GetResult();
 
         Assert.True(result.IsSuccessful);

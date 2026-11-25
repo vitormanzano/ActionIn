@@ -3,10 +3,11 @@ using ActionIn.Authentication.Domain.ValueObjects;
 using ActionIn.Core.Results;
 using ActionIn.Authentication.Domain.Hasher;
 using ActionIn.Authentication.Domain.Errors;
+using ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 
 namespace ActionIn.Authentication.Domain;
 
-public sealed class Account : Entity, IAggregateRoot
+public sealed class Account : AggregateRoot
 {
     public Username Username { get; private set; } = null!;
     public Email Email { get; private set; } = null!;
@@ -44,6 +45,9 @@ public sealed class Account : Entity, IAggregateRoot
         if (fieldErrors.Count > 0)
             return Result<Account>.Failure(AuthenticationErrors.Account.InvalidData(fieldErrors));
 
-        return Result<Account>.Success(new Account(usernameResult.Value, emailResult.Value, passwordResult.Value));
+        var account = new Account(usernameResult.Value, emailResult.Value, passwordResult.Value);
+
+        account.AddDomainEvent(new NewAccountRegisteredEvent(account.Id, account.Email.Address, account.Username.Text));
+        return Result<Account>.Success(account);
     }
 }

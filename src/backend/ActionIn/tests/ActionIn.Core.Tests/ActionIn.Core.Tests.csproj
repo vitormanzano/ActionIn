@@ -13,6 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Services\ActionIn.Core\ActionIn.Core.csproj" />
+    <ProjectReference Include="..\..\src\Services\Core\ActionIn.Core\ActionIn.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,13 +1,11 @@
-using ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 using ActionIn.Authentication.Domain.Repository;
 using ActionIn.Authentication.Domain.Services;
-using ActionIn.Core.Mediatr;
 using ActionIn.Core.Messages.Commands;
 using ActionIn.Core.Results;
 
 namespace ActionIn.Authentication.Application.Commands.RegisterAccount;
 
-public class RegisterAccountCommandHandler(IAuthenticationService authenticationService, IAuthenticationRepository authenticationRepository, IMediatrHandler bus) : ICommandHandler<RegisterAccountCommand>
+public class RegisterAccountCommandHandler(IAuthenticationService authenticationService, IAuthenticationRepository authenticationRepository) : ICommandHandler<RegisterAccountCommand>
 {
     public async Task<Result> Handle(RegisterAccountCommand command, CancellationToken cancellationToken)
     {
@@ -24,8 +22,6 @@ public class RegisterAccountCommandHandler(IAuthenticationService authentication
         if (commitResult.IsFailure)
             return commitResult;
 
-        // That event, will be throw by the entity later
-        await bus.PublishEvent(new NewAccountRegisteredEvent(account.Id, account.Email.Address, account.Username.Text));
         return Result.Success();
     }
 }

@@ -1,7 +1,8 @@
 <Solution>
   <Folder Name="/src/" />
-  <Folder Name="/src/Services/">
-    <Project Path="src/Services/ActionIn.Core/ActionIn.Core.csproj" />
+  <Folder Name="/src/Services/Core/">
+    <Project Path="src/Services/Core/ActionIn.Core.Infrastructure/ActionIn.Core.Infrastructure.csproj" />
+    <Project Path="src/Services/Core/ActionIn.Core/ActionIn.Core.csproj" />
   </Folder>
   <Folder Name="/src/Services/Authentication/">
     <Project Path="src/Services/Authentication/ActionIn.Authentication.Application/ActionIn.Authentication.Application.csproj" />
