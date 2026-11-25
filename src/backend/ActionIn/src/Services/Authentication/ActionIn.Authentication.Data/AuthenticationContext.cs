@@ -2,13 +2,14 @@
 using ActionIn.Authentication.Domain;
 using ActionIn.Authentication.Domain.Errors;
 using ActionIn.Core.Data;
+using ActionIn.Core.Infrastructure.Interceptor;
 using ActionIn.Core.Results;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace ActionIn.Authentication.Data;
 
-public class AuthenticationContext(DbContextOptions<AuthenticationContext> options) : DbContext(options), IUnitOfWork
+public class AuthenticationContext(DbContextOptions<AuthenticationContext> options, PublishDomainEventInterceptor interceptor) : DbContext(options), IUnitOfWork
 {
     private const string UniqueViolation = "23505";
 
@@ -18,6 +19,9 @@ public class AuthenticationContext(DbContextOptions<AuthenticationContext> optio
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthenticationContext).Assembly);
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.AddInterceptors(interceptor);
 
     public async Task<Result> Commit(CancellationToken cancellationToken)
     {

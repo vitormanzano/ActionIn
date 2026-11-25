@@ -1,4 +1,5 @@
 using ActionIn.Authentication.Data;
+using ActionIn.Core.Infrastructure.Interceptor;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 
@@ -6,6 +7,7 @@ namespace ActionIn.IntegrationTests.Infrastructure;
 
 public class PostgreSqlFixture : IAsyncLifetime
 {
+    private readonly FakeMediatrHandler _fakeMediatrHandler = new();
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:18")
         .Build();
 
@@ -17,7 +19,7 @@ public class PostgreSqlFixture : IAsyncLifetime
             .UseNpgsql(ConnectionString)
             .Options;
 
-        return new AuthenticationContext(options);
+        return new AuthenticationContext(options, new PublishDomainEventInterceptor(_fakeMediatrHandler));
     }
     public async Task CleanTableAccountsAsync()
     {

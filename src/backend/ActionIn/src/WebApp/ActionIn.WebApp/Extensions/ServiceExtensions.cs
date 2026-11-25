@@ -7,7 +7,8 @@ using ActionIn.Authentication.Domain.Hasher;
 using ActionIn.Authentication.Domain.Notifications;
 using ActionIn.Authentication.Domain.Repository;
 using ActionIn.Authentication.Domain.Services;
-using ActionIn.Core.Mediatr;
+using ActionIn.Core.Infrastructure.Interceptor;
+using ActionIn.Core.Infrastructure.Mediatr;
 using ActionIn.Core.Messages.Commands;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,6 +56,13 @@ public static class ServiceExtensions
     {
         services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
         services.AddScoped<IEmailSender, EmailSender>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddDbInterceptor(this IServiceCollection services)
+    {
+        services.AddScoped<PublishDomainEventInterceptor>();
 
         return services;
     }

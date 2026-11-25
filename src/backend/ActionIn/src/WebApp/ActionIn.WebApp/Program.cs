@@ -16,6 +16,8 @@ builder.Services.AddProblemDetails();
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
 
+builder.Services.AddDbInterceptor();
+
 builder.Services.AddDbContext(connectionString);
 
 builder.Services.Mediator();
