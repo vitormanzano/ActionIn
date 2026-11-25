@@ -1,4 +1,4 @@
-namespace ActionIn.Authentication.Domain.Notifications;
+namespace ActionIn.Authentication.Application.Notifications;
 
 public interface IEmailSender
 {

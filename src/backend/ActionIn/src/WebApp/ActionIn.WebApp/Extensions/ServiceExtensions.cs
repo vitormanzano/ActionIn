@@ -1,10 +1,10 @@
 using ActionIn.Authentication.AntiCorruption;
 using ActionIn.Authentication.Application.Commands.RegisterAccount;
+using ActionIn.Authentication.Application.Notifications;
 using ActionIn.Authentication.Data;
 using ActionIn.Authentication.Data.Repository;
 using ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 using ActionIn.Authentication.Domain.Hasher;
-using ActionIn.Authentication.Domain.Notifications;
 using ActionIn.Authentication.Domain.Repository;
 using ActionIn.Authentication.Domain.Services;
 using ActionIn.Core.Infrastructure.Interceptor;
@@ -39,7 +39,6 @@ public static class ServiceExtensions
         services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommandHandler).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(NewAccountRegisteredEvent).Assembly);
             });
 
         return services;

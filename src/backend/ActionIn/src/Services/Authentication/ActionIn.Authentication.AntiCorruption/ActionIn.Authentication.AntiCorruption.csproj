@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
+    <ProjectReference Include="..\ActionIn.Authentication.Application\ActionIn.Authentication.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MailKit" />

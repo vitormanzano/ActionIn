@@ -36,7 +36,7 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var email = Assert.Single(_factory.EmailSender.SentMessages);
 
-        Assert.Equal(request.Email, email.To.Address);
+        Assert.Equal(request.Email, email.To);
 
         await using var context = postgres.CreateDbContext();
 
