@@ -1,7 +1,8 @@
 using ActionIn.Authentication.Domain;
 using ActionIn.Authentication.Domain.Errors;
-using ActionIn.Authentication.Domain.ValueObjects;
+using ActionIn.Authentication.Domain.Events.NewAccountRegistered;
 using ActionIn.Authentication.Tests.UnitTests.Infrastructure;
+using ActionIn.Core.DomainObjects;
 using ActionIn.Core.Results;
 
 namespace ActionIn.Authentication.Tests.UnitTests;
@@ -55,5 +56,20 @@ public class AccountTests
         Account.Register("vitor", "invalid", "secret123", _hasher);
 
         Assert.Equal(1, _hasher.HashCalls);
+    }
+
+    [Fact]
+    public void Register_ValidData_AddNewAccountRegisteredEvent()
+    {
+        Result<Account> result = Account.Register("vitor", "vitor@example.com", "Secret123", _hasher);
+
+        Assert.True(result.IsSuccess);
+
+        Account account = result.Value;
+
+        DomainEvent domainEvent = Assert.Single(account.DomainEvents);
+
+        Assert.Equal(account.Id, domainEvent.AggregateId);
+        Assert.Equal(typeof(NewAccountRegisteredEvent), domainEvent.GetType());
     }
 }
