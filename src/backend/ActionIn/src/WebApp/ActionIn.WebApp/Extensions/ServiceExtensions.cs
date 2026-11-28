@@ -14,12 +14,13 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static IServiceCollection Mediator(this IServiceCollection services, params Assembly[] moduleAssemblies)
+    public static IServiceCollection Mediator(this IServiceCollection services, string licenseKey, params Assembly[] moduleAssemblies)
     {
         services.AddScoped<IMediatrHandler, MediatrHandler>();
 
         services.AddMediatR(cfg =>
             {
+                cfg.LicenseKey = licenseKey;
                 cfg.RegisterServicesFromAssemblies(moduleAssemblies);
 
                 cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));

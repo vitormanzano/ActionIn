@@ -18,7 +18,10 @@ string? connectionString = builder.Configuration.GetConnectionString("DefaultCon
 builder.Services.AddDbInterceptor();
 
 builder.Services.AddAuthenticationModule(connectionString, builder.Configuration);
-builder.Services.Mediator(AuthenticationModule.ApplicationAssembly);
+
+string? mediatRLicenseKey = builder.Configuration.GetValue<string>("MediatR:LicenseKey");
+
+builder.Services.Mediator(mediatRLicenseKey!, AuthenticationModule.ApplicationAssembly);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
