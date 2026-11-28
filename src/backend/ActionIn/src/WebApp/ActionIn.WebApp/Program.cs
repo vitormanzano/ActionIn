@@ -9,7 +9,6 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-
 builder.Services.AddProblemDetails();
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -21,7 +20,7 @@ builder.Services.AddAuthenticationModule(connectionString, builder.Configuration
 
 string? mediatRLicenseKey = builder.Configuration.GetValue<string>("MediatR:LicenseKey");
 
-builder.Services.Mediator(mediatRLicenseKey!, AuthenticationModule.ApplicationAssembly);
+builder.Services.Mediator(mediatRLicenseKey, AuthenticationModule.ApplicationAssembly);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 

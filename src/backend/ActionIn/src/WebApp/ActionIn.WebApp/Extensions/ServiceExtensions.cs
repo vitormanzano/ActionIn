@@ -14,7 +14,7 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static IServiceCollection Mediator(this IServiceCollection services, string licenseKey, params Assembly[] moduleAssemblies)
+    public static IServiceCollection Mediator(this IServiceCollection services, string? licenseKey, params Assembly[] moduleAssemblies)
     {
         services.AddScoped<IMediatrHandler, MediatrHandler>();
 

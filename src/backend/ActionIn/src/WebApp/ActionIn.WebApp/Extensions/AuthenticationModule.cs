@@ -45,7 +45,13 @@ public static class AuthenticationModule
 
     private static IServiceCollection AddSmtp(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
+        services.AddOptions<SmtpSettings>()
+            .Bind(configuration.GetSection(SmtpSettings.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(settings => string.IsNullOrEmpty(settings.Username) == string.IsNullOrEmpty(settings.Password),
+                "Smtp:Username and Smtp:Password must be set together.")
+            .ValidateOnStart();
+
         services.AddScoped<IEmailSender, EmailSender>();
 
         return services;
