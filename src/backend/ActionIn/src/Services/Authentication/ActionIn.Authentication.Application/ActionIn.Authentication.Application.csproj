@@ -2,4 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ActionIn.Authentication.Domain\ActionIn.Authentication.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
 </Project>
