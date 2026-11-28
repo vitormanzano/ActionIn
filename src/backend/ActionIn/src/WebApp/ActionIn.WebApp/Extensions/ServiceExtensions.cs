@@ -10,6 +10,7 @@ using ActionIn.Core.Infrastructure.Behaviors;
 using ActionIn.Core.Infrastructure.Interceptor;
 using ActionIn.Core.Infrastructure.Mediatr;
 using ActionIn.Core.Messages.Commands;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace ActionIn.WebApp.Extensions;
@@ -35,6 +36,8 @@ public static class ServiceExtensions
     public static IServiceCollection Mediator(this IServiceCollection services)
     {
         services.AddScoped<IMediatrHandler, MediatrHandler>();
+
+        services.AddValidatorsFromAssembly(typeof(RegisterAccountCommandValidator).Assembly);
 
         services.AddMediatR(cfg =>
             {
