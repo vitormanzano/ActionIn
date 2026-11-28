@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http.Json;
 using ActionIn.Authentication.Application.Dtos;
 using ActionIn.IntegrationTests.Infrastructure;
+using ActionIn.Authentication.Domain.ValueObjects;
 
 namespace ActionIn.IntegrationTests.Authentication.Register;
 
@@ -87,6 +88,120 @@ public class RegisterAccountTest(PostgreSqlFixture postgres) : IAsyncLifetime
         var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
         Assert.NotNull(problem);
         Assert.Equal("Account.InvalidData", problem.Extensions["code"]?.ToString());
+        Assert.Contains(invalidField, problem.Errors.Keys);
+
+        await using var context = postgres.CreateDbContext();
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
+        Assert.Equal(0, accounts);
+
+        Assert.Empty(_factory.EmailSender.SentMessages);
+    }
+
+    [Theory]
+    [InlineData("", "vitor@example.com", "example123", "Username")]
+    [InlineData("vitor", "", "example123", "Email")]
+    [InlineData("vitor", "vitor@example.com", "", "Password")]
+    [InlineData("", "", "", "Username")]
+    public async Task Register_EmptyFields_ReturnsCommandValidationFailed(string username, string email, string password, string invalidField)
+    {
+        var request = new RegisterAccountDto(username, email, password);
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(ProblemJson, response.Content.Headers.ContentType?.MediaType);
+
+        var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal("Validation.Failed", problem.Extensions["code"]?.ToString());
+        Assert.Contains(invalidField, problem.Errors.Keys);
+
+        await using var context = postgres.CreateDbContext();
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
+        Assert.Equal(0, accounts);
+
+        Assert.Empty(_factory.EmailSender.SentMessages);
+    }
+
+    [Fact]
+    public async Task Register_TooLongUsername_ReturnsCommandValidationFailed()
+    {
+        var username = new string('a', Username.MaxLength + 1);
+        var email = "vi@example.com";
+        var password = "secret123";
+        var invalidField = "Username";
+
+        var request = new RegisterAccountDto(username, email, password);
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(ProblemJson, response.Content.Headers.ContentType?.MediaType);
+
+        var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal("Validation.Failed", problem.Extensions["code"]?.ToString());
+        Assert.Contains(invalidField, problem.Errors.Keys);
+
+        await using var context = postgres.CreateDbContext();
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
+        Assert.Equal(0, accounts);
+
+        Assert.Empty(_factory.EmailSender.SentMessages);
+    }
+
+    [Fact]
+    public async Task Register_TooLongEmail_ReturnsCommandValidationFailed()
+    {
+        var username = "vitor";
+
+        const string domain = "@example.com";
+        string email = new string('a', Email.MaxLength + 1 - domain.Length) + domain;
+
+        var password = "secret123";
+        var invalidField = "Email";
+
+        var request = new RegisterAccountDto(username, email, password);
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(ProblemJson, response.Content.Headers.ContentType?.MediaType);
+
+        var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal("Validation.Failed", problem.Extensions["code"]?.ToString());
+        Assert.Contains(invalidField, problem.Errors.Keys);
+
+        await using var context = postgres.CreateDbContext();
+        var accounts = await context.Accounts.CountAsync(a => a.Email.Address == request.Email);
+        Assert.Equal(0, accounts);
+
+        Assert.Empty(_factory.EmailSender.SentMessages);
+    }
+
+    [Fact]
+    public async Task Register_TooLongPassword_ReturnsCommandValidationFailed()
+    {
+        var username = "vitor";
+        var email = "vi@example.com";
+        var password = new string('a', Password.MaxLength + 1);
+        var invalidField = "Password";
+
+        var request = new RegisterAccountDto(username, email, password);
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(RegisterAccountUrl, request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(ProblemJson, response.Content.Headers.ContentType?.MediaType);
+
+        var problem = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+        Assert.NotNull(problem);
+        Assert.Equal("Validation.Failed", problem.Extensions["code"]?.ToString());
         Assert.Contains(invalidField, problem.Errors.Keys);
 
         await using var context = postgres.CreateDbContext();

@@ -17,13 +17,10 @@ public class RegisterAccountCommandValidator : AbstractValidator<RegisterAccount
 
         RuleFor(c => c.Username)
             .NotEmpty().WithError(AuthenticationErrors.Username.Empty)
-            .MinimumLength(Username.MinLength).WithError(AuthenticationErrors.Username.TooShort)
             .MaximumLength(Username.MaxLength).WithError(AuthenticationErrors.Username.TooLong);
 
         RuleFor(c => c.Password)
             .NotEmpty().WithError(AuthenticationErrors.Password.Empty)
-            .MinimumLength(Password.MinLength).WithError(AuthenticationErrors.Password.TooShort)
             .MaximumLength(Password.MaxLength).WithError(AuthenticationErrors.Password.TooLong);
     }
 }
-
