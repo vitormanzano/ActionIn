@@ -9,7 +9,6 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddCustomServices();
 
 builder.Services.AddProblemDetails();
 
@@ -18,11 +17,8 @@ string? connectionString = builder.Configuration.GetConnectionString("DefaultCon
 
 builder.Services.AddDbInterceptor();
 
-builder.Services.AddDbContext(connectionString);
-
-builder.Services.Mediator();
-builder.Services.AddCustomCommands();
-builder.Services.AddSmtp(builder.Configuration);
+builder.Services.AddAuthenticationModule(connectionString, builder.Configuration);
+builder.Services.Mediator(AuthenticationModule.ApplicationAssembly);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
